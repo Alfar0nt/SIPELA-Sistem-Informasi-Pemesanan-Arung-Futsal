@@ -13,6 +13,10 @@ Namespace Forms
     Public Class frmLogin
 
         Private Sub frmLogin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+            ModUIHelper.TerapkanTemaForm(Me)
+            ModUIHelper.TerapkanGayaTombol(btnLogin, ModUIHelper.TombolTipe.PrimaryMint)
+            ModUIHelper.TerapkanGayaTombol(btnKeluar, ModUIHelper.TombolTipe.OutlineWhite)
+            ModUIHelper.TerapkanBadgePill(lblStatus, ModUIHelper.ColorCoral, ModUIHelper.ColorCrispSlate)
             lblStatus.Text = String.Empty
             txtUsername.Clear()
             txtPassword.Clear()

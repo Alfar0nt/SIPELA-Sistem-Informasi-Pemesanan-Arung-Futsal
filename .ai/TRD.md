@@ -1,9 +1,10 @@
 # TRD — Technical Requirements Document: SIPELA
 
-> **Versi**: 2.0 — Full Operational Architecture  
-> **Tanggal**: 4 November 2026  
+> **Versi**: 2.1 — Full Operational Architecture  
+> **Tanggal**: 5 November 2026  
 > **Runtime Target**: .NET 10.0 Windows Forms (VB.NET)  
-> **Database**: MySQL 8.0 / MariaDB InnoDB
+> **Database**: MySQL 8.0 / MariaDB InnoDB  
+> **Status**: Fase Operasional Inti Selesai (Fase 9 s.d. 15) — 1 Bug Fix Analitik Terbuka
 
 ---
 
@@ -78,7 +79,13 @@ SIPELA-Sistem-Informasi-Pemesanan-Arung-Futsal/
 │       ├── 9router/                      # AI gateway support
 │       └── herdr/                        # Multiplexing support
 ├── Database/
-│   └── arung_futsal.sql                  # Skrip DDL & DML skema database
+│   ├── arung_futsal.sql                  # Skrip DDL & DML skema database
+│   └── migration_v2_views_procedures.sql # Migrasi v2: views & stored procedures (re-runable)
+├── pics/                                 # Tangkapan layar aplikasi (dipakai README)
+│   ├── homepage-admin.png
+│   ├── pemesanan.png
+│   └── daftar-sewa.png
+├── README.md                             # Ringkasan proyek, fitur, & screenshot
 ├── SIPELA/                               # Root Solusi VB.NET
 │   ├── SIPELA.slnx                       # Solution File
 │   ├── SIPELA.vbproj                     # Project File (.NET 10 WinForms)

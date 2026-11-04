@@ -25,6 +25,15 @@ Namespace Forms
         End Sub
 
         Private Sub KonfigurasiTampilan()
+            ModUIHelper.TerapkanTemaForm(Me)
+            ModUIHelper.TerapkanGayaGrid(dgvLapangan)
+
+            ModUIHelper.TerapkanGayaTombol(btnSimpan, ModUIHelper.TombolTipe.PrimaryMint)
+            ModUIHelper.TerapkanGayaTombol(btnUbah, ModUIHelper.TombolTipe.SecondarySky)
+            ModUIHelper.TerapkanGayaTombol(btnHapus, ModUIHelper.TombolTipe.DangerCoral)
+            ModUIHelper.TerapkanGayaTombol(btnBersihkan, ModUIHelper.TombolTipe.OutlineWhite)
+            ModUIHelper.TerapkanGayaTombol(btnKembali, ModUIHelper.TombolTipe.OutlineWhite)
+
             txtIdLapangan.ReadOnly = True
             cmbJenisLantai.DropDownStyle = ComboBoxStyle.DropDownList
             If cmbJenisLantai.Items.Count > 0 Then
@@ -35,15 +44,6 @@ Namespace Forms
             numHargaPerJam.Maximum = 10000000D
             numHargaPerJam.DecimalPlaces = 0
             numHargaPerJam.ThousandsSeparator = True
-
-            dgvLapangan.ReadOnly = True
-            dgvLapangan.AllowUserToAddRows = False
-            dgvLapangan.AllowUserToDeleteRows = False
-            dgvLapangan.MultiSelect = False
-            dgvLapangan.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-            dgvLapangan.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-            dgvLapangan.RowHeadersVisible = False
-            dgvLapangan.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(245, 245, 250)
         End Sub
 
         Private Sub MuatDataLapangan()

@@ -1,9 +1,9 @@
 # PRD — Product Requirements Document: SIPELA (Sistem Informasi Pemesanan Arung Futsal)
 
-> **Versi**: 2.0 — Full Operational System Scope  
-> **Tanggal**: 4 November 2026  
+> **Versi**: 2.1 — Full Operational System Scope  
+> **Tanggal**: 5 November 2026  
 > **Mata Kuliah**: Pemrograman Desktop — Semester 3 (UPN "Veteran" Jawa Timur)  
-> **Status**: Perencanaan Sistem Operasional Penuh
+> **Status**: Fase Operasional Inti Selesai (Fase 9 s.d. 15) — 1 Bug Fix Analitik Terbuka
 
 ---
 

@@ -180,6 +180,7 @@ SELECT
   l.`jenis_lantai`,
   dp.`tanggal_main`,
   dp.`jam_mulai`,
+  dp.`harga_slot`,
   p.`id_pemesanan`,
   p.`kode_booking`,
   p.`nama_pemesan`,

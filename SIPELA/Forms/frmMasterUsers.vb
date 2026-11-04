@@ -25,18 +25,18 @@ Namespace Forms
         End Sub
 
         Private Sub KonfigurasiTampilan()
+            ModUIHelper.TerapkanTemaForm(Me)
+            ModUIHelper.TerapkanGayaGrid(dgvUsers)
+
+            ModUIHelper.TerapkanGayaTombol(btnSimpan, ModUIHelper.TombolTipe.PrimaryMint)
+            ModUIHelper.TerapkanGayaTombol(btnUbah, ModUIHelper.TombolTipe.SecondarySky)
+            ModUIHelper.TerapkanGayaTombol(btnHapus, ModUIHelper.TombolTipe.DangerCoral)
+            ModUIHelper.TerapkanGayaTombol(btnBersihkan, ModUIHelper.TombolTipe.OutlineWhite)
+            ModUIHelper.TerapkanGayaTombol(btnKembali, ModUIHelper.TombolTipe.OutlineWhite)
+
             txtIdUser.ReadOnly = True
             cmbRole.DropDownStyle = ComboBoxStyle.DropDownList
             If cmbRole.Items.Count > 0 Then cmbRole.SelectedIndex = 0
-
-            dgvUsers.ReadOnly = True
-            dgvUsers.AllowUserToAddRows = False
-            dgvUsers.AllowUserToDeleteRows = False
-            dgvUsers.MultiSelect = False
-            dgvUsers.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-            dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-            dgvUsers.RowHeadersVisible = False
-            dgvUsers.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(245, 245, 250)
         End Sub
 
         Private Sub MuatDataUsers()
