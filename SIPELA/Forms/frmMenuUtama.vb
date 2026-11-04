@@ -28,8 +28,10 @@ Namespace Forms
                 btnMasterUsers.Enabled = False
             End If
 
-            ' Menu transaksi pemesanan dapat diakses oleh Admin maupun Owner
+            ' Menu transaksi operasional dapat diakses oleh Admin maupun Owner
             btnPemesanan.Enabled = True
+            btnPembayaran.Enabled = True
+            btnJadwal.Enabled = True
         End Sub
 
         Private Sub btnMasterLapangan_Click(sender As Object, e As EventArgs) Handles btnMasterLapangan.Click
@@ -48,17 +50,13 @@ Namespace Forms
         End Sub
 
         Private Sub btnPembayaran_Click(sender As Object, e As EventArgs) Handles btnPembayaran.Click
-            ModErrorHandler.TampilkanInfo(
-                "Fitur Transaksi Pembayaran sedang disiapkan untuk tahap berikutnya (Week 11/Final Project).",
-                "Fitur Mendatang"
-            )
+            Dim formPembayaran As New frmPembayaran()
+            formPembayaran.ShowDialog(Me)
         End Sub
 
         Private Sub btnJadwal_Click(sender As Object, e As EventArgs) Handles btnJadwal.Click
-            ModErrorHandler.TampilkanInfo(
-                "Fitur Kalender Jadwal Lapangan sedang disiapkan untuk tahap berikutnya (Week 11/Final Project).",
-                "Fitur Mendatang"
-            )
+            Dim formJadwal As New frmJadwal()
+            formJadwal.ShowDialog(Me)
         End Sub
 
         Private Sub btnLaporan_Click(sender As Object, e As EventArgs) Handles btnLaporan.Click

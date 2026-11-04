@@ -73,14 +73,14 @@ flowchart TD
 
 **Tujuan**: Pemrosesan kasir untuk pembayaran DP dan Pelunasan dengan dukungan berbagai metode pembayaran, pembaruan status pemesanan, dan pencetakan bukti transaksi.
 
-| # | Task | Detail Teknis | File Output |
-|---|------|---------------|-------------|
-| 11.1 | Designer UI | Panel pencarian kode booking, Card rincian tagihan (total sewa, status DP, sisa tagihan), Panel input pembayaran kasir | `SIPELA/Forms/frmPembayaran.Designer.vb` |
-| 11.2 | Auto No Transaksi | Memanggil `ModAutoNumber.AmbilNomorBerikutnya("PAY", tanggal)` menghasilkan `PAY-YYYYMMDD-XXXX` | `SIPELA/Forms/frmPembayaran.vb` |
-| 11.3 | Logika Jenis Bayar | Validasi jenis: Jika status 'Menunggu DP' → pilihan jenis DP (minimal 30%). Jika 'DP Terbayar' → pilihan jenis Pelunasan (sebesar sisa tagihan) | ↑ |
-| 11.4 | Metode Pembayaran | Dukungan pilihan Tunai, QRIS, dan Transfer Bank. Perhitungan kembalian otomatis untuk pembayaran tunai | ↑ |
-| 11.5 | Update Status Pemesanan | Eksekusi UPDATE status pemesanan menjadi 'DP Terbayar' atau 'Lunas' begitu record `pembayaran` berhasil disimpan | ↑ |
-| 11.6 | Generator Struk / Nota | Dialog cetak struk taktil (`frmNotaPreview`) atau pencetakan via `System.Drawing.Printing.PrintDocument` | `SIPELA/Forms/frmNotaPreview.vb` |
+| # | Task | Detail Teknis | Status | File Output |
+|---|------|---------------|--------|-------------|
+| 11.1 | Designer UI | Panel pencarian kode booking, Card rincian tagihan (total sewa, status DP, sisa tagihan), Panel input pembayaran kasir | [x] Selesai | `SIPELA/Forms/frmPembayaran.Designer.vb` |
+| 11.2 | Auto No Transaksi | Memanggil `ModAutoNumber.AmbilNomorBerikutnya("PAY", tanggal)` menghasilkan `PAY-YYYYMMDD-XXXX` | [x] Selesai | `SIPELA/Forms/frmPembayaran.vb` |
+| 11.3 | Logika Jenis Bayar | Validasi jenis: Jika status 'Menunggu DP' → pilihan jenis DP (minimal 30%). Jika 'DP Terbayar' → pilihan jenis Pelunasan (sebesar sisa tagihan) | [x] Selesai | ↑ |
+| 11.4 | Metode Pembayaran | Dukungan pilihan Tunai, QRIS, dan Transfer Bank. Perhitungan kembalian otomatis untuk pembayaran tunai | [x] Selesai | ↑ |
+| 11.5 | Update Status Pemesanan | Eksekusi UPDATE status pemesanan menjadi 'DP Terbayar' atau 'Lunas' begitu record `pembayaran` berhasil disimpan | [x] Selesai | ↑ |
+| 11.6 | Generator Struk / Nota | Dialog cetak struk taktil (`frmNotaPreview`) atau pencetakan via `System.Drawing.Printing.PrintDocument` | [x] Selesai | `SIPELA/Forms/frmNotaPreview.vb` |
 
 ---
 
@@ -88,12 +88,12 @@ flowchart TD
 
 **Tujuan**: Memberikan visibilitas menyeluruh terhadap seluruh slot lapangan dalam format matriks waktu 08.00–24.00 per tanggal.
 
-| # | Task | Detail Teknis | File Output |
-|---|------|---------------|-------------|
-| 12.1 | Designer UI | Date navigator bar (tombol Hari Ini, Prev, Next), Legend status (Hijau = Tersedia, Merah = Terisi, Kuning = Holding DP), Matriks grid container | `SIPELA/Forms/frmJadwal.Designer.vb` |
-| 12.2 | Data Query Jadwal | Query data slot dari database menggunakan view `v_jadwal_lapangan` terfilter tanggal terpilih | `SIPELA/Forms/frmJadwal.vb` |
-| 12.3 | Dynamic Matrix Rendering | Membuat kartu/sel slot secara dinamis per pertemuan kolom (lapangan) dan baris (slot jam) dengan warna status yang jelas | ↑ |
-| 12.4 | Interaksi Klik Slot | Klik slot terisi → tampilkan pop-up ringkasan pemesan dan kontak; Klik slot kosong → navigasi cepat ke form pemesanan dengan slot terisi otomatis | ↑ |
+| # | Task | Detail Teknis | Status | File Output |
+|---|------|---------------|--------|-------------|
+| 12.1 | Designer UI | Date navigator bar (tombol Hari Ini, Prev, Next), Legend status (Hijau = Tersedia, Merah = Terisi, Kuning = Holding DP), Matriks grid container | [x] Selesai | `SIPELA/Forms/frmJadwal.Designer.vb` |
+| 12.2 | Data Query Jadwal | Query data slot dari database menggunakan view `v_jadwal_lapangan` terfilter tanggal terpilih | [x] Selesai | `SIPELA/Forms/frmJadwal.vb` |
+| 12.3 | Dynamic Matrix Rendering | Membuat kartu/sel slot secara dinamis per pertemuan kolom (lapangan) dan baris (slot jam) dengan warna status yang jelas | [x] Selesai | ↑ |
+| 12.4 | Interaksi Klik Slot | Klik slot terisi → tampilkan pop-up ringkasan pemesan dan kontak; Klik slot kosong → navigasi cepat ke form pemesanan dengan slot terisi otomatis | [x] Selesai | ↑ |
 
 ---
 
