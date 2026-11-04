@@ -2,11 +2,22 @@ Option Strict On
 Option Explicit On
 
 Imports System
+Imports System.Data
+Imports System.Threading.Tasks
 Imports System.Windows.Forms
+Imports MySql.Data.MySqlClient
 
 Namespace Forms
 
+    ''' <summary>
+    ''' Form Menu Utama & Dasbor Operasional SIPELA (Arung Futsal).
+    ''' Menangani navigasi antar form berdasarkan peran (Admin/Owner) serta
+    ''' menjalankan background worker berkala untuk pembatalan otomatis booking kedaluwarsa.
+    ''' </summary>
     Public Class frmMenuUtama
+
+        ' Timer latar belakang untuk mengeksekusi sp_kedaluwarsakan_pemesanan setiap 30 detik
+        Private WithEvents _tmrAutoExpire As New Timer()
 
         Private Sub frmMenuUtama_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             ' Pastikan sesi valid
@@ -22,16 +33,54 @@ Namespace Forms
             If ModSesi.IsOwner Then
                 btnMasterLapangan.Enabled = True
                 btnMasterUsers.Enabled = True
+                btnLaporan.Enabled = True
             Else
-                ' Admin
+                ' Admin / Kasir
                 btnMasterLapangan.Enabled = False
                 btnMasterUsers.Enabled = False
+                ' Tombol laporan tetap aktif tetapi akan menampilkan notifikasi hak akses jika diklik
+                btnLaporan.Enabled = True
             End If
 
-            ' Menu transaksi operasional dapat diakses oleh Admin maupun Owner
+            ' Menu transaksi operasional aktif untuk semua peran
             btnPemesanan.Enabled = True
             btnPembayaran.Enabled = True
             btnJadwal.Enabled = True
+
+            ' Inisialisasi background maintenance timer (berjalan setiap 30 detik)
+            _tmrAutoExpire.Interval = 30000
+            _tmrAutoExpire.Start()
+
+            ' Jalankan pemeriksaan kedaluwarsa pertama kali saat dasbor dibuka
+            EksekusiAutoExpireAsync()
+        End Sub
+
+        Private Sub frmMenuUtama_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+            ' Hentikan timer background saat form ditutup
+            _tmrAutoExpire.Stop()
+        End Sub
+
+        Private Sub _tmrAutoExpire_Tick(sender As Object, e As EventArgs) Handles _tmrAutoExpire.Tick
+            EksekusiAutoExpireAsync()
+        End Sub
+
+        ''' <summary>
+        ''' Memanggil Stored Procedure sp_kedaluwarsakan_pemesanan secara asinkron di thread terpisah
+        ''' agar antarmuka kasir tetap responsif tanpa jeda/freeze.
+        ''' </summary>
+        Private Async Sub EksekusiAutoExpireAsync()
+            Await Task.Run(Sub()
+                               Try
+                                   Using conn As MySqlConnection = ModKoneksi.BukaKoneksi()
+                                       Using cmd As New MySqlCommand("sp_kedaluwarsakan_pemesanan", conn)
+                                           cmd.CommandType = CommandType.StoredProcedure
+                                           cmd.ExecuteNonQuery()
+                                       End Using
+                                   End Using
+                               Catch
+                                   ' Abaikan jika database sesaat tidak merespons agar tidak mengganggu kasir
+                               End Try
+                           End Sub)
         End Sub
 
         Private Sub btnMasterLapangan_Click(sender As Object, e As EventArgs) Handles btnMasterLapangan.Click
@@ -60,14 +109,21 @@ Namespace Forms
         End Sub
 
         Private Sub btnLaporan_Click(sender As Object, e As EventArgs) Handles btnLaporan.Click
-            ModErrorHandler.TampilkanInfo(
-                "Fitur Laporan Pendapatan & Okupansi sedang disiapkan untuk tahap berikutnya (Week 11/Final Project).",
-                "Fitur Mendatang"
-            )
+            If Not ModSesi.IsOwner Then
+                ModErrorHandler.TampilkanPeringatan(
+                    "Laporan Keuangan & Analitik Operasional hanya dapat diakses oleh akun Owner.",
+                    "Akses Terbatas"
+                )
+                Return
+            End If
+
+            Dim formLaporan As New frmLaporan()
+            formLaporan.ShowDialog(Me)
         End Sub
 
         Private Sub btnLogout_Click(sender As Object, e As EventArgs) Handles btnLogout.Click
             If ModErrorHandler.Konfirmasi("Apakah Anda yakin ingin keluar dari sistem?", "Konfirmasi Logout") Then
+                _tmrAutoExpire.Stop()
                 ModSesi.Logout()
                 Me.Close()
             End If
@@ -76,4 +132,3 @@ Namespace Forms
     End Class
 
 End Namespace
-

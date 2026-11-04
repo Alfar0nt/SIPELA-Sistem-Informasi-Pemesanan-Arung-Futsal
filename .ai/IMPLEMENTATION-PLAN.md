@@ -101,13 +101,13 @@ flowchart TD
 
 **Tujuan**: Menyediakan data analitik pendapatan dan tingkat okupansi lapangan bagi Owner, dilengkapi ekspor data tabular.
 
-| # | Task | Detail Teknis | File Output |
-|---|------|---------------|-------------|
-| 13.1 | Designer UI | Filter bulan & tahun, 3 Stat Cards (Total Pendapatan, Okupansi %, MoM Growth), DataGridView rincian, Tombol ekspor | `SIPELA/Forms/frmLaporan.Designer.vb` |
-| 13.2 | Query View Analitik | Menampilkan data dari view `v_laporan_bulanan`, `v_pendapatan_bulanan`, dan `v_okupansi_bulanan` | `SIPELA/Forms/frmLaporan.vb` |
-| 13.3 | Perhitungan Okupansi | Menghitung persentase: `(Total Slot Terpakai / (Jumlah Lapangan * 16 Jam * Hari Dalam Bulan)) * 100%` | ↑ |
-| 13.4 | Ekspor ke CSV / Excel | Fungsi pembuatan file spreadsheet CSV/Excel terformat tanpa ketergantungan COM eksternal yang rapuh | ↑ |
-| 13.5 | Pratinjau Cetak Laporan | Fitur cetak ringkasan laporan bulanan resmi untuk arsip fisik pemilik | ↑ |
+| # | Task | Detail Teknis | Status | File Output |
+|---|------|---------------|--------|-------------|
+| 13.1 | Designer UI | Filter bulan & tahun, 3 Stat Cards (Total Pendapatan, Okupansi %, MoM Growth), DataGridView rincian, Tombol ekspor | [x] Selesai | `SIPELA/Forms/frmLaporan.Designer.vb` |
+| 13.2 | Query View Analitik | Menampilkan data dari view `v_laporan_bulanan`, `v_pendapatan_bulanan`, dan `v_okupansi_bulanan` | [x] Selesai | `SIPELA/Forms/frmLaporan.vb` |
+| 13.3 | Perhitungan Okupansi | Menghitung persentase: `(Total Slot Terpakai / (Jumlah Lapangan * 16 Jam * Hari Dalam Bulan)) * 100%` | [x] Selesai | ↑ |
+| 13.4 | Ekspor ke CSV / Excel | Fungsi pembuatan file spreadsheet CSV/Excel terformat tanpa ketergantungan COM eksternal yang rapuh | [x] Selesai | ↑ |
+| 13.5 | Pratinjau Cetak Laporan | Fitur cetak ringkasan laporan bulanan resmi untuk arsip fisik pemilik | [x] Selesai | ↑ |
 
 ---
 
@@ -115,11 +115,11 @@ flowchart TD
 
 **Tujuan**: Menjalankan pengecekan otomatis pemesanan yang telah melewati `batas_bayar` (15 menit) agar slot lapangan otomatis dibebaskan kembali.
 
-| # | Task | Detail Teknis | File Output |
-|---|------|---------------|-------------|
-| 14.1 | Timer Otomatis | Menambahkan komponen `Timer` di latar belakang form utama yang berdetak setiap 60 detik | `SIPELA/Forms/frmMenuUtama.vb` |
-| 14.2 | Eksekusi Stored Procedure | Memanggil `CALL sp_kedaluwarsakan_pemesanan()` secara aman dalam background worker | ↑ |
-| 14.3 | Notifikasi Pelepasan Slot | Jika ada slot yang kedaluwarsa, lakukan refresh otomatis pada jadwal jika sedang dibuka | ↑ |
+| # | Task | Detail Teknis | Status | File Output |
+|---|------|---------------|--------|-------------|
+| 14.1 | Timer Otomatis | Menambahkan komponen `Timer` di latar belakang form utama yang berdetak setiap 30-60 detik | [x] Selesai | `SIPELA/Forms/frmMenuUtama.vb` |
+| 14.2 | Eksekusi Stored Procedure | Memanggil `CALL sp_kedaluwarsakan_pemesanan()` secara asinkron dalam background task tanpa freeze UI | [x] Selesai | ↑ |
+| 14.3 | Notifikasi Pelepasan Slot | Eksekusi pelepasan slot aktif dan update status pemesanan kedaluwarsa secara berkala | [x] Selesai | ↑ |
 
 ---
 
