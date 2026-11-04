@@ -50,8 +50,7 @@ Namespace Forms
             Using conn As MySqlConnection = ModKoneksi.BukaKoneksi()
                 Const sql As String =
                     "SELECT id_lapangan, nama_lapangan, jenis_lantai, harga_per_jam, is_active, " &
-                    "CASE WHEN is_active = 1 THEN 'Aktif' ELSE 'Nonaktif' END AS status_teks, " &
-                    "created_at " &
+                    "CASE WHEN is_active = 1 THEN 'Aktif' ELSE 'Nonaktif' END AS status_teks " &
                     "FROM lapangan ORDER BY id_lapangan ASC"
 
                 Using da As New MySqlDataAdapter(sql, conn)
@@ -91,9 +90,6 @@ Namespace Forms
 
             If dgvLapangan.Columns.Contains("is_active") Then
                 dgvLapangan.Columns("is_active").Visible = False
-            End If
-            If dgvLapangan.Columns.Contains("created_at") Then
-                dgvLapangan.Columns("created_at").Visible = False
             End If
         End Sub
 

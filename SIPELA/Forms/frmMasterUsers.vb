@@ -43,8 +43,8 @@ Namespace Forms
             Using conn As MySqlConnection = ModKoneksi.BukaKoneksi()
                 Const sql As String =
                     "SELECT id_user, username, password_hash, nama_lengkap, role, is_active, " &
-                    "CASE WHEN is_active = 1 THEN 'Aktif' ELSE 'Nonaktif' END AS status_teks, " &
-                    "created_at FROM users ORDER BY id_user ASC"
+                    "CASE WHEN is_active = 1 THEN 'Aktif' ELSE 'Nonaktif' END AS status_teks " &
+                    "FROM users ORDER BY id_user ASC"
 
                 Using da As New MySqlDataAdapter(sql, conn)
                     _tabelUsers = New DataTable()
@@ -86,9 +86,6 @@ Namespace Forms
             End If
             If dgvUsers.Columns.Contains("is_active") Then
                 dgvUsers.Columns("is_active").Visible = False
-            End If
-            If dgvUsers.Columns.Contains("created_at") Then
-                dgvUsers.Columns("created_at").Visible = False
             End If
         End Sub
 

@@ -10,6 +10,8 @@ CREATE DATABASE IF NOT EXISTS `arung_futsal`
 
 USE `arung_futsal`;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- ---------------------------------------------------------------------
 -- 1. TABEL: users
 -- ---------------------------------------------------------------------
@@ -22,11 +24,12 @@ CREATE TABLE IF NOT EXISTS `users` (
   `is_active` BOOLEAN NOT NULL DEFAULT TRUE,
   `gagal_login` TINYINT NOT NULL DEFAULT 0,
   `terkunci_sampai` DATETIME NULL DEFAULT NULL,
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_user`),
   UNIQUE KEY `uq_users_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Pastikan id_user memiliki AUTO_INCREMENT jika tabel sudah pernah dibuat sebelumnya
+ALTER TABLE `users` MODIFY COLUMN `id_user` INT NOT NULL AUTO_INCREMENT;
 
 -- ---------------------------------------------------------------------
 -- 2. TABEL: lapangan
@@ -37,12 +40,13 @@ CREATE TABLE IF NOT EXISTS `lapangan` (
   `jenis_lantai` VARCHAR(50) NOT NULL,
   `harga_per_jam` DECIMAL(10, 0) NOT NULL,
   `is_active` BOOLEAN NOT NULL DEFAULT TRUE,
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_lapangan`),
   UNIQUE KEY `uq_lapangan_nama` (`nama_lapangan`),
   CONSTRAINT `chk_harga_positif` CHECK (`harga_per_jam` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Pastikan id_lapangan memiliki AUTO_INCREMENT jika tabel sudah pernah dibuat sebelumnya
+ALTER TABLE `lapangan` MODIFY COLUMN `id_lapangan` INT NOT NULL AUTO_INCREMENT;
 
 -- ---------------------------------------------------------------------
 -- 3. TABEL: pemesanan
@@ -66,6 +70,8 @@ CREATE TABLE IF NOT EXISTS `pemesanan` (
   CONSTRAINT `fk_pemesanan_user` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+ALTER TABLE `pemesanan` MODIFY COLUMN `id_pemesanan` INT NOT NULL AUTO_INCREMENT;
+
 -- ---------------------------------------------------------------------
 -- 4. TABEL: detail_pemesanan
 -- ---------------------------------------------------------------------
@@ -84,6 +90,8 @@ CREATE TABLE IF NOT EXISTS `detail_pemesanan` (
   CONSTRAINT `fk_detail_pemesanan` FOREIGN KEY (`id_pemesanan`) REFERENCES `pemesanan` (`id_pemesanan`) ON DELETE RESTRICT,
   CONSTRAINT `fk_detail_lapangan` FOREIGN KEY (`id_lapangan`) REFERENCES `lapangan` (`id_lapangan`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `detail_pemesanan` MODIFY COLUMN `id_detail` INT NOT NULL AUTO_INCREMENT;
 
 -- ---------------------------------------------------------------------
 -- 5. TABEL: pembayaran
@@ -105,6 +113,8 @@ CREATE TABLE IF NOT EXISTS `pembayaran` (
   CONSTRAINT `fk_pembayaran_user` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+ALTER TABLE `pembayaran` MODIFY COLUMN `id_pembayaran` INT NOT NULL AUTO_INCREMENT;
+
 -- ---------------------------------------------------------------------
 -- 6. TABEL: penomoran (Auto Number Generator)
 -- ---------------------------------------------------------------------
@@ -114,6 +124,8 @@ CREATE TABLE IF NOT EXISTS `penomoran` (
   `nomor_terakhir` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`jenis`, `tanggal`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- ---------------------------------------------------------------------
 -- 7. STORED PROCEDURES
@@ -224,17 +236,14 @@ LEFT JOIN `v_okupansi_bulanan` o ON p.`periode` = o.`periode`;
 -- Users demo (password hash SHA-256)
 -- owner: owner123 -> 43a0d17178a9d26c9e0fe9a74b0b45e38d32f27aed887a008a54bf6e033bf7b9
 -- admin: admin123 -> 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
-INSERT INTO `users` (`username`, `password_hash`, `nama_lengkap`, `role`, `is_active`)
+INSERT IGNORE INTO `users` (`username`, `password_hash`, `nama_lengkap`, `role`, `is_active`)
 VALUES
   ('owner', '43a0d17178a9d26c9e0fe9a74b0b45e38d32f27aed887a008a54bf6e033bf7b9', 'Pemilik Usaha Arung Futsal', 'Owner', TRUE),
-  ('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Staf Resepsionis Kasir', 'Admin', TRUE)
-ON DUPLICATE KEY UPDATE `nama_lengkap` = VALUES(`nama_lengkap`);
+  ('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Staf Resepsionis Kasir', 'Admin', TRUE);
 
 -- Master Lapangan awal
-INSERT INTO `lapangan` (`nama_lapangan`, `jenis_lantai`, `harga_per_jam`, `is_active`)
+INSERT IGNORE INTO `lapangan` (`nama_lapangan`, `jenis_lantai`, `harga_per_jam`, `is_active`)
 VALUES
   ('Lapangan A', 'Vinyl', 100000, TRUE),
   ('Lapangan B', 'Rumput Sintetis', 120000, TRUE),
-  ('Lapangan C', 'Vinyl', 100000, TRUE)
-ON DUPLICATE KEY UPDATE `harga_per_jam` = VALUES(`harga_per_jam`);
-
+  ('Lapangan C', 'Vinyl', 100000, TRUE);
