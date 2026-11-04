@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="Forms\frmLogin.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmMasterLapangan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmMasterUsers.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmMenuUtama.vb">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
