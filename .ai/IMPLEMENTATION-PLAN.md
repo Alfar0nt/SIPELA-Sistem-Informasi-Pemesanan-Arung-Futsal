@@ -1,190 +1,162 @@
-# IMPLEMENTATION-PLAN — Rencana Implementasi
+# IMPLEMENTATION-PLAN — Rencana Implementasi Sistem Operasional SIPELA
 
-> **Versi**: 1.0 — Week 10 Deliverable  
+> **Versi**: 2.0 — Full Operational System Plan  
 > **Tanggal**: 4 November 2026  
-> **Status**: Selesai Diimplementasikan (Menunggu Eksekusi Script SQL & Run Testing oleh Pengguna)
+> **Status**: Perencanaan Sistem Penuh (Fase Baru di Atas, Arsip Week 10 Dikompresi di Bawah)
 
 ---
 
-## Ringkasan
+## 🛠️ Skills Terpasang & Panduan Penggunaan
 
-Total **8 fase**, diurutkan berdasarkan dependensi. Seluruh fase 1 s.d. 8 telah berhasil diimplementasikan dan diverifikasi dengan `dotnet build` tanpa error.
+Sesuai instruksi dan audit skill proyek, berikut adalah daftar skill yang terpasang di folder lokal `./.agents/skills/` dan akan digunakan selama tahapan implementasi:
 
----
-
-## Fase 1: Project Setup
-
-**Tujuan**: Buat project VB.NET Windows Forms .NET 10
-
-| # | Task | Detail | Status | File Output |
-|---|------|--------|--------|-------------|
-| 1.1 | Buat solution dan project | Solusi & WinForms .NET 10 VB.NET | [x] Selesai | `SIPELA/SIPELA.slnx`, `SIPELA/SIPELA.vbproj` |
-| 1.2 | Buat folder struktur | Buat `Forms/`, `Modules/` di dalam folder project | [x] Selesai | Folder `Forms/`, `Modules/` |
-| 1.3 | Konfigurasi `.vbproj` | Target `net10.0-windows`, `WinExe`, `UseWindowsForms` | [x] Selesai | `SIPELA/SIPELA.vbproj` |
-
-**Checkpoint**: `dotnet build` berhasil tanpa error. [x]
+1. **`dotnet-best-practices`** (Baru diinstal via `find-skills` dari `github/awesome-copilot`):
+   - **Tujuan**: Memastikan penulisan kode VB.NET .NET 10 mengikuti kaidah arsitektur bersih, *resource management* (pembuangan koneksi database `Using ... End Using`, `Dispose`), optimasi *parameterized query*, dan penanganan memori UI form.
+2. **`find-skills`** (`./.agents/skills/find-skills/`):
+   - **Tujuan**: Menemukan dan memasang skill tambahan dari ekosistem open-agent jika diperlukan library atau perkakas pendukung baru di tengah pengembangan.
+3. **`9router`** (`./.agents/skills/9router/`):
+   - **Tujuan**: Gateway AI lokal/remote OpenAI-compatible jika nantinya dibutuhkan integrasi bantuan asisten teks otomatis, analisis teks ulasan, atau modul pelengkap.
+4. **`herdr`** (`./.agents/skills/herdr/`):
+   - **Tujuan**: Terminal multiplexer untuk mendelegasikan perintah terminal panjang/paralel bila diinstruksikan oleh pengguna.
 
 ---
 
-## Fase 2: Database — SQL Script
+## 🚀 Rencana Baru: Sistem Operasional Penuh (Fase 9 s.d. 15)
 
-**Tujuan**: Buat skrip SQL lengkap untuk database `arung_futsal`
-
-| # | Task | Detail | Status | File Output |
-|---|------|--------|--------|-------------|
-| 2.1 | CREATE DATABASE | `CREATE DATABASE IF NOT EXISTS arung_futsal` | [x] Selesai | `Database/arung_futsal.sql` |
-| 2.2 | Tabel `users` | Lengkap dengan PK, UNIQUE, DEFAULT, CHECK | [x] Selesai | ↑ |
-| 2.3 | Tabel `lapangan` | Lengkap dengan PK, UNIQUE, DEFAULT, CHECK | [x] Selesai | ↑ |
-| 2.4 | Tabel `pemesanan` | Lengkap dengan FK, ENUM, CHECK | [x] Selesai | ↑ |
-| 2.5 | Tabel `detail_pemesanan` | Lengkap dengan FK, UNIQUE composite slot, CHECK | [x] Selesai | ↑ |
-| 2.6 | Tabel `pembayaran` | Lengkap dengan FK, UNIQUE composite, ENUM, CHECK | [x] Selesai | ↑ |
-| 2.7 | Tabel `penomoran` | Composite PK, DEFAULT | [x] Selesai | ↑ |
-| 2.8 | Stored Procedure `sp_nomor_berikutnya` | INSERT ON DUPLICATE KEY UPDATE, atomik | [x] Selesai | ↑ |
-| 2.9 | Stored Procedure `sp_kedaluwarsakan_pemesanan` | Update status expired | [x] Selesai | ↑ |
-| 2.10 | Views (4 views) | `v_jadwal_lapangan`, `v_pendapatan_bulanan`, `v_okupansi_bulanan`, `v_laporan_bulanan` | [x] Selesai | ↑ |
-| 2.11 | Sample Data | 2 users (owner, admin hash SHA-256) + 3 lapangan dummy | [x] Selesai | ↑ |
-
-**Checkpoint**: Skrip SQL siap dijalankan oleh pengguna di MySQL server lokal. [x]
-
----
-
-## Fase 3: NuGet Package
-
-**Tujuan**: Install MySql.Data connector
-
-| # | Task | Detail | Status | File Output |
-|---|------|--------|--------|-------------|
-| 3.1 | Install `MySql.Data` | Terpasang `MySql.Data` v26.10.0 pada `SIPELA.vbproj` | [x] Selesai | `SIPELA/SIPELA.vbproj` |
-
-**Checkpoint**: `dotnet build` berhasil dengan `MySql.Data` terpasang. [x]
-
----
-
-## Fase 4: Modules — Business Logic Layer
-
-**Tujuan**: Buat 4 module pendukung
-
-| # | Task | Detail | Status | File Output |
-|---|------|--------|--------|-------------|
-| 4.1 | `ModKoneksi.vb` | Connection string, `BukaKoneksi()`, `TestKoneksi()`, error handling koneksi | [x] Selesai | `SIPELA/Modules/ModKoneksi.vb` |
-| 4.2 | `ModSesi.vb` | Property: IdUser, Username, NamaLengkap, Role. Method: Logout() | [x] Selesai | `SIPELA/Modules/ModSesi.vb` |
-| 4.3 | `ModErrorHandler.vb` | `TampilkanError()`, `TampilkanPeringatan()`, `TampilkanInfo()`, `Konfirmasi()`, logging ke file | [x] Selesai | `SIPELA/Modules/ModErrorHandler.vb` |
-| 4.4 | `ModAutoNumber.vb` | `AmbilNomorBerikutnya()` memanggil `sp_nomor_berikutnya`, `BuatKodeOtomatis()` | [x] Selesai | `SIPELA/Modules/ModAutoNumber.vb` |
-
-**Checkpoint**: `dotnet build` berhasil dan modul siap diakses dari seluruh form. [x]
-
----
-
-## Fase 5: Form Login (`frmLogin`)
-
-**Tujuan**: Form autentikasi dengan SHA-256 hashing dan proteksi brute force
-
-| # | Task | Detail | Status | File Output |
-|---|------|--------|--------|-------------|
-| 5.1 | Designer | Layout 420×345, TextBox user & pass, btnLogin, btnKeluar, lblStatus | [x] Selesai | `SIPELA/Forms/frmLogin.Designer.vb` |
-| 5.2 | Logic — Validasi field | Cek username dan password tidak kosong | [x] Selesai | `SIPELA/Forms/frmLogin.vb` |
-| 5.3 | Logic — Query user | SELECT by username, cek is_active, cek terkunci_sampai | [x] Selesai | ↑ |
-| 5.4 | Logic — Hash & compare | SHA-256 hash password input, bandingkan dengan password_hash di DB | [x] Selesai | ↑ |
-| 5.5 | Logic — Gagal login | Increment gagal_login, kunci akun 15 menit jika 5x gagal | [x] Selesai | ↑ |
-| 5.6 | Logic — Berhasil | Reset gagal_login, set ModSesi, hide login, show frmMenuUtama | [x] Selesai | ↑ |
-| 5.7 | Set sebagai startup form | Diatur di `Application.myapp` dan `Application.Designer.vb` | [x] Selesai | `SIPELA/My Project/Application.Designer.vb` |
-
-**Checkpoint**: Autentikasi dan alur form login berhasil diimplementasikan. [x]
-
----
-
-## Fase 6: Form Menu Utama (`frmMenuUtama`)
-
-**Tujuan**: Navigasi utama dengan role-based access
-
-| # | Task | Detail | Status | File Output |
-|---|------|--------|--------|-------------|
-| 6.1 | Designer | Layout 720×510, Panel header & footer, 6 tombol menu card, tombol Logout | [x] Selesai | `SIPELA/Forms/frmMenuUtama.Designer.vb` |
-| 6.2 | Logic — Load | Tampilkan nama + role dari ModSesi. Enable/disable menu sesuai role | [x] Selesai | `SIPELA/Forms/frmMenuUtama.vb` |
-| 6.3 | Logic — Navigasi | Klik Master Lapangan → buka `frmMasterLapangan`. Klik Master Users → buka `frmMasterUsers` | [x] Selesai | ↑ |
-| 6.4 | Logic — Future menus | Tombol Pemesanan, Pembayaran, Jadwal, Laporan diberi notifikasi "Fitur Mendatang" | [x] Selesai | ↑ |
-| 6.5 | Logic — Logout | Konfirmasi logout → ModSesi.Logout() → close menu → kembali ke `frmLogin` | [x] Selesai | ↑ |
-
-**Checkpoint**: Role-based access control menu utama berhasil diimplementasikan. [x]
-
----
-
-## Fase 7: Form Master Lapangan (`frmMasterLapangan`)
-
-**Tujuan**: CRUD lapangan dengan DataGridView, validasi, dan pencarian
-
-| # | Task | Detail | Status | File Output |
-|---|------|--------|--------|-------------|
-| 7.1 | Designer | Layout 940×575, Panel input kiri + DataGridView kanan, 4 button aksi, search bar | [x] Selesai | `SIPELA/Forms/frmMasterLapangan.Designer.vb` |
-| 7.2 | Logic — Load | Muat DataGridView dari MySQL, set default input, format angka mata uang | [x] Selesai | `SIPELA/Forms/frmMasterLapangan.vb` |
-| 7.3 | Logic — Create | Validasi → Cek duplikasi nama → INSERT → refresh DataGridView → reset | [x] Selesai | ↑ |
-| 7.4 | Logic — Read | Klik baris di DataGridView → populate data ke form input → masuk mode Ubah | [x] Selesai | ↑ |
-| 7.5 | Logic — Update | Validasi → Cek duplikasi jika ganti nama → UPDATE → refresh DataGridView | [x] Selesai | ↑ |
-| 7.6 | Logic — Soft Delete | Konfirmasi → UPDATE `is_active = FALSE` → refresh DataGridView | [x] Selesai | ↑ |
-| 7.7 | Logic — Bersihkan | Reset field → mode Tambah (Simpan enabled, Ubah & Nonaktifkan disabled) | [x] Selesai | ↑ |
-| 7.8 | Logic — Cari | Filter DataView realtime berdasarkan keyword nama/jenis/status | [x] Selesai | ↑ |
-| 7.9 | Logic — Validasi | Nama wajib, jenis lantai wajib, harga > 0, nama unik | [x] Selesai | ↑ |
-| 7.10 | Logic — Kembali | Tutup dialog form → kembali ke `frmMenuUtama` | [x] Selesai | ↑ |
-
-**Checkpoint**: CRUD Master Lapangan lengkap dengan validasi dan DataGridView berhasil dikompilasi. [x]
-
----
-
-## Fase 8: Form Master Users (`frmMasterUsers`)
-
-**Tujuan**: CRUD user dengan DataGridView, ComboBox role, SHA-256, validasi
-
-| # | Task | Detail | Status | File Output |
-|---|------|--------|--------|-------------|
-| 8.1 | Designer | Layout 950×600, GroupBox input user + DataGridView, ComboBox role, 4 button aksi | [x] Selesai | `SIPELA/Forms/frmMasterUsers.Designer.vb` |
-| 8.2 | Logic — Load | Muat data pengguna, sembunyikan `password_hash`, isi opsi ComboBox role | [x] Selesai | `SIPELA/Forms/frmMasterUsers.vb` |
-| 8.3 | Logic — Create | Validasi → Hash SHA-256 password → INSERT → refresh DataGridView | [x] Selesai | ↑ |
-| 8.4 | Logic — Read | Klik baris → populate data (password dikosongkan untuk keamanan) → mode Ubah | [x] Selesai | ↑ |
-| 8.5 | Logic — Update | Validasi → Hash password baru jika diisi / pertahankan hash lama jika kosong → UPDATE | [x] Selesai | ↑ |
-| 8.6 | Logic — Soft Delete | Cek bukan user yang sedang aktif login → konfirmasi → UPDATE `is_active = FALSE` | [x] Selesai | ↑ |
-| 8.7 | Logic — Bersihkan | Reset semua field → mode Tambah | [x] Selesai | ↑ |
-| 8.8 | Logic — Cari | Filter realtime DataView berdasarkan username, nama lengkap, atau role | [x] Selesai | ↑ |
-| 8.9 | Logic — Validasi | Username min 4 karakter & unik, password min 6 karakter, nama lengkap wajib, role wajib | [x] Selesai | ↑ |
-| 8.10 | Logic — Kembali | Tutup dialog form → kembali ke menu utama | [x] Selesai | ↑ |
-| 8.11 | Logic — Kolom grid | Sembunyikan kolom sensitif `password_hash` dari DataGridView | [x] Selesai | ↑ |
-
-**Checkpoint**: CRUD Master Users lengkap dengan hashing SHA-256 dan proteksi diri berhasil dikompilasi. [x]
-
----
-
-## Dependency Graph
+Tahapan berikut dirancang secara komprehensif untuk melengkapi seluruh sistem operasional **Arung Futsal** berbasis dokumen ADSI dan DFD 1 s.d. 3:
 
 ```mermaid
 flowchart TD
-    P1["[x] Fase 1: Project Setup"] --> P2["[x] Fase 2: Database SQL"]
-    P1 --> P3["[x] Fase 3: NuGet (User)"]
-    P3 --> P4["[x] Fase 4: Modules"]
-    P2 --> P4
-    P4 --> P5["[x] Fase 5: frmLogin"]
-    P5 --> P6["[x] Fase 6: frmMenuUtama"]
-    P6 --> P7["[x] Fase 7: frmMasterLapangan"]
-    P6 --> P8["[x] Fase 8: frmMasterUsers"]
+    P9["Fase 9: Modul UI Helper & Styling Taktil"] --> P10["Fase 10: Form Pemesanan (frmPemesanan)"]
+    P9 --> P11["Fase 11: Form Pembayaran & Struk (frmPembayaran)"]
+    P10 --> P12["Fase 12: Form Matriks Jadwal (frmJadwal)"]
+    P11 --> P12
+    P11 --> P13["Fase 13: Form Laporan & Ekspor (frmLaporan)"]
+    P10 --> P14["Fase 14: Background Auto-Expiration Routine"]
+    P12 --> P15["Fase 15: Integrasi Dashboard & Role Hardening"]
+    P13 --> P15
 ```
 
 ---
 
-## File Summary
+### Fase 9: UI Styling Helper Module (`ModUIHelper.vb`)
 
-| # | File | Fase | Status | Deskripsi |
-|---|------|------|--------|-----------|
-| 1 | `SIPELA/SIPELA.slnx` | 1 | [x] Selesai | Solution file |
-| 2 | `SIPELA/SIPELA.vbproj` | 1 | [x] Selesai | Project file (.NET 10 WinForms) |
-| 3 | `Database/arung_futsal.sql` | 2 | [x] Selesai | SQL script lengkap (6 tabel, 2 SP, 4 view, seed data) |
-| 4 | `SIPELA/Modules/ModKoneksi.vb` | 4 | [x] Selesai | Database connection module (MySQL) |
-| 5 | `SIPELA/Modules/ModSesi.vb` | 4 | [x] Selesai | Session management module (ID, nama, role) |
-| 6 | `SIPELA/Modules/ModErrorHandler.vb` | 4 | [x] Selesai | Error handling & file logger module |
-| 7 | `SIPELA/Modules/ModAutoNumber.vb` | 4 | [x] Selesai | Auto-numbering module via SP |
-| 8 | `SIPELA/Forms/frmLogin.vb` | 5 | [x] Selesai | Login form logic (SHA-256 & 5x brute-force lock) |
-| 9 | `SIPELA/Forms/frmLogin.Designer.vb` | 5 | [x] Selesai | Login form UI designer |
-| 10 | `SIPELA/Forms/frmMenuUtama.vb` | 6 | [x] Selesai | Menu form logic (role-based access) |
-| 11 | `SIPELA/Forms/frmMenuUtama.Designer.vb` | 6 | [x] Selesai | Menu form UI designer |
-| 12 | `SIPELA/Forms/frmMasterLapangan.vb` | 7 | [x] Selesai | Master lapangan CRUD logic & search |
-| 13 | `SIPELA/Forms/frmMasterLapangan.Designer.vb` | 7 | [x] Selesai | Master lapangan UI designer |
-| 14 | `SIPELA/Forms/frmMasterUsers.vb` | 8 | [x] Selesai | Master users CRUD logic, ComboBox role, & search |
-| 15 | `SIPELA/Forms/frmMasterUsers.Designer.vb` | 8 | [x] Selesai | Master users UI designer |
-| 16 | `SIPELA/My Project/Application.Designer.vb` | 5 | [x] Selesai | Startup form diarahkan ke `frmLogin` |
+**Tujuan**: Mengimplementasikan standar desain **Tactile Claymorphism + Neo-Brutalism** ke seluruh kontrol Windows Forms melalui modul pembantu terpusat.
+
+| # | Task | Detail Teknis | Status | File Output |
+|---|------|---------------|--------|-------------|
+| 9.1 | Skema Warna & Konstanta | Deklarasi warna hex resmi: `WarmCream (#FDFBF7)`, `CrispSlate (#2D334A)`, `MintGreen (#25C16F)`, `SkyBlue (#AED4E6)`, `Coral (#FFB5B5)`, `Lavender (#D8D4F2)` | [x] Selesai | `SIPELA/Modules/ModUIHelper.vb` |
+| 9.2 | Styling Tombol Taktil | Subroutine `TerapkanGayaTombol(btn, tipe)`: set FlatStyle, BorderSize 2, FlatAppearance.BorderColor slate, dan event handler MouseEnter, MouseDown, MouseUp untuk efek kedalaman mekanis | [x] Selesai | ↑ |
+| 9.3 | Styling DataGridView Taktil | Subroutine `TerapkanGayaGrid(dgv)`: set header slate gelap, alternating rows pastel lavender, selection sky blue, border tegas | [x] Selesai | ↑ |
+| 9.4 | Styling Panel Card | Subroutine `TerapkanGayaCard(pnl)`: latar putih, border 2.5px slate ink, dan efek bayangan offset solid | [x] Selesai | ↑ |
+| 9.5 | Styling Badge Pill | Helper untuk menggambar label berbentuk pill rounded dengan warna status yang sesuai | [x] Selesai | ↑ |
+
+---
+
+### Fase 10: Form Transaksi Pemesanan (`frmPemesanan`) & Slot Picker Engine
+
+**Tujuan**: Memungkinkan kasir/admin mencatat pemesanan sewa lapangan dengan pemilihan slot visual jam 08.00–24.00, kalkulasi otomatis, dan pencegahan double-booking.
+
+| # | Task | Detail Teknis | Status | File Output |
+|---|------|---------------|--------|-------------|
+| 10.1 | Designer UI | Layout 2 kolom: Panel pemesan kiri (nama, no. HP, tanggal, lapangan) + Visual Slot Selector kanan + Summary Card | [x] Selesai | `SIPELA/Forms/frmPemesanan.Designer.vb` |
+| 10.2 | Auto Kode Booking | Integrasi `ModAutoNumber.AmbilNomorBerikutnya("BKG", tanggal)` menghasilkan format `BKG-YYYYMMDD-XXXX` | [x] Selesai | `SIPELA/Forms/frmPemesanan.vb` |
+| 10.3 | Interactive Slot Grid | 16 tombol slot jam (08:00 s.d. 23:00) yang memuat status ketersediaan secara realtime berdasarkan tanggal dan lapangan terpilih | [x] Selesai | ↑ |
+| 10.4 | Validasi Bentrok (Anti-Collision) | Cek tabel `detail_pemesanan` dengan constraint `uq_slot_aktif`. Blokir pemilihan slot yang sudah memiliki status aktif | [x] Selesai | ↑ |
+| 10.5 | Auto-Calculation | Kalkulasi otomatis durasi sewa, `total_sewa = durasi * harga_per_jam`, dan `jumlah_dp = 30% * total_sewa` | [x] Selesai | ↑ |
+| 10.6 | Batas Waktu Bayar | Atur `batas_bayar = NOW() + INTERVAL 15 MINUTE` | [x] Selesai | ↑ |
+| 10.7 | Transaksi DB Atomik | Simpan header `pemesanan` dan baris-baris `detail_pemesanan` dalam satu `MySqlTransaction` | [x] Selesai | ↑ |
+
+---
+
+### Fase 11: Form Transaksi Pembayaran (`frmPembayaran`) & Generator Nota/Struk
+
+**Tujuan**: Pemrosesan kasir untuk pembayaran DP dan Pelunasan dengan dukungan berbagai metode pembayaran, pembaruan status pemesanan, dan pencetakan bukti transaksi.
+
+| # | Task | Detail Teknis | File Output |
+|---|------|---------------|-------------|
+| 11.1 | Designer UI | Panel pencarian kode booking, Card rincian tagihan (total sewa, status DP, sisa tagihan), Panel input pembayaran kasir | `SIPELA/Forms/frmPembayaran.Designer.vb` |
+| 11.2 | Auto No Transaksi | Memanggil `ModAutoNumber.AmbilNomorBerikutnya("PAY", tanggal)` menghasilkan `PAY-YYYYMMDD-XXXX` | `SIPELA/Forms/frmPembayaran.vb` |
+| 11.3 | Logika Jenis Bayar | Validasi jenis: Jika status 'Menunggu DP' → pilihan jenis DP (minimal 30%). Jika 'DP Terbayar' → pilihan jenis Pelunasan (sebesar sisa tagihan) | ↑ |
+| 11.4 | Metode Pembayaran | Dukungan pilihan Tunai, QRIS, dan Transfer Bank. Perhitungan kembalian otomatis untuk pembayaran tunai | ↑ |
+| 11.5 | Update Status Pemesanan | Eksekusi UPDATE status pemesanan menjadi 'DP Terbayar' atau 'Lunas' begitu record `pembayaran` berhasil disimpan | ↑ |
+| 11.6 | Generator Struk / Nota | Dialog cetak struk taktil (`frmNotaPreview`) atau pencetakan via `System.Drawing.Printing.PrintDocument` | `SIPELA/Forms/frmNotaPreview.vb` |
+
+---
+
+### Fase 12: Form Visual Matriks Jadwal Lapangan (`frmJadwal`)
+
+**Tujuan**: Memberikan visibilitas menyeluruh terhadap seluruh slot lapangan dalam format matriks waktu 08.00–24.00 per tanggal.
+
+| # | Task | Detail Teknis | File Output |
+|---|------|---------------|-------------|
+| 12.1 | Designer UI | Date navigator bar (tombol Hari Ini, Prev, Next), Legend status (Hijau = Tersedia, Merah = Terisi, Kuning = Holding DP), Matriks grid container | `SIPELA/Forms/frmJadwal.Designer.vb` |
+| 12.2 | Data Query Jadwal | Query data slot dari database menggunakan view `v_jadwal_lapangan` terfilter tanggal terpilih | `SIPELA/Forms/frmJadwal.vb` |
+| 12.3 | Dynamic Matrix Rendering | Membuat kartu/sel slot secara dinamis per pertemuan kolom (lapangan) dan baris (slot jam) dengan warna status yang jelas | ↑ |
+| 12.4 | Interaksi Klik Slot | Klik slot terisi → tampilkan pop-up ringkasan pemesan dan kontak; Klik slot kosong → navigasi cepat ke form pemesanan dengan slot terisi otomatis | ↑ |
+
+---
+
+### Fase 13: Form Laporan Pendapatan, Okupansi & Ekspor (`frmLaporan`)
+
+**Tujuan**: Menyediakan data analitik pendapatan dan tingkat okupansi lapangan bagi Owner, dilengkapi ekspor data tabular.
+
+| # | Task | Detail Teknis | File Output |
+|---|------|---------------|-------------|
+| 13.1 | Designer UI | Filter bulan & tahun, 3 Stat Cards (Total Pendapatan, Okupansi %, MoM Growth), DataGridView rincian, Tombol ekspor | `SIPELA/Forms/frmLaporan.Designer.vb` |
+| 13.2 | Query View Analitik | Menampilkan data dari view `v_laporan_bulanan`, `v_pendapatan_bulanan`, dan `v_okupansi_bulanan` | `SIPELA/Forms/frmLaporan.vb` |
+| 13.3 | Perhitungan Okupansi | Menghitung persentase: `(Total Slot Terpakai / (Jumlah Lapangan * 16 Jam * Hari Dalam Bulan)) * 100%` | ↑ |
+| 13.4 | Ekspor ke CSV / Excel | Fungsi pembuatan file spreadsheet CSV/Excel terformat tanpa ketergantungan COM eksternal yang rapuh | ↑ |
+| 13.5 | Pratinjau Cetak Laporan | Fitur cetak ringkasan laporan bulanan resmi untuk arsip fisik pemilik | ↑ |
+
+---
+
+### Fase 14: Background Routine Maintenance (Auto-Expiration)
+
+**Tujuan**: Menjalankan pengecekan otomatis pemesanan yang telah melewati `batas_bayar` (15 menit) agar slot lapangan otomatis dibebaskan kembali.
+
+| # | Task | Detail Teknis | File Output |
+|---|------|---------------|-------------|
+| 14.1 | Timer Otomatis | Menambahkan komponen `Timer` di latar belakang form utama yang berdetak setiap 60 detik | `SIPELA/Forms/frmMenuUtama.vb` |
+| 14.2 | Eksekusi Stored Procedure | Memanggil `CALL sp_kedaluwarsakan_pemesanan()` secara aman dalam background worker | ↑ |
+| 14.3 | Notifikasi Pelepasan Slot | Jika ada slot yang kedaluwarsa, lakukan refresh otomatis pada jadwal jika sedang dibuka | ↑ |
+
+---
+
+### Fase 15: Integrasi Dashboard & Role Hardening
+
+**Tujuan**: Menyambungkan seluruh tombol di `frmMenuUtama` ke form-form baru, memperbarui metrik realtime di dashboard, dan memastikan hak akses Admin vs Owner terjaga ketat.
+
+| # | Task | Detail Teknis | File Output |
+|---|------|---------------|-------------|
+| 15.1 | Wiring Event Tombol | Mengganti dialog "Fitur Mendatang" di `frmMenuUtama` dengan pembukaan form riil (`frmPemesanan`, `frmPembayaran`, `frmJadwal`, `frmLaporan`) | `SIPELA/Forms/frmMenuUtama.vb` |
+| 15.2 | Dynamic Stat Cards | Menampilkan data riil di 4 stat card menu utama (Booking Hari Ini, Pending DP, Pendapatan Bulan Ini) | ↑ |
+| 15.3 | Penerapan Gaya Taktil Baru | Terapkan `ModUIHelper` pada `frmLogin`, `frmMenuUtama`, `frmMasterLapangan`, dan `frmMasterUsers` agar konsisten | Seluruh form |
+| 15.4 | Verifikasi Kompilasi & Build | `dotnet build` solusi untuk memastikan 0 warning dan 0 error | `SIPELA/SIPELA.vbproj` |
+
+---
+
+### 📌 Catatan Khusus: Fitur Masa Depan (Post-MVP / Roadmap Lanjutan)
+- **Modul Open Sparring (`frmOpenSparring`)**:
+  - DFD Level 0 (Proses 4.0) mencakup fitur *Kelola Open Sparring* untuk mempertemukan tim yang kekurangan lawan.
+  - Sesuai arahan pengguna, fitur ini dicatat (*taken-note*) untuk dikembangkan pada iterasi setelah 5 fitur operasional inti di atas selesai dan berjalan penuh.
+
+---
+
+## 📦 Arsip Historis: Fase 1 s.d. 8 (Week 10 Deliverable — Selesai)
+
+<details>
+<summary><strong>Klik untuk melihat detail Fase 1 s.d. 8 yang telah selesai diimplementasikan</strong></summary>
+
+### Ringkasan Pencapaian Week 10
+Seluruh fondasi dasar aplikasi telah selesai dibangun, terkompilasi bersih dengan .NET 10 dan MySQL:
+- **Fase 1 (Project Setup)**: Pembuatan solusi VB.NET .NET 10 Windows Forms (`SIPELA.slnx`, `SIPELA.vbproj`).
+- **Fase 2 (Database SQL Script)**: Skrip lengkap `Database/arung_futsal.sql` (6 tabel, 2 stored procedures, 4 views, seed data).
+- **Fase 3 (NuGet Package)**: Pemasangan connector resmi `MySql.Data` v26.10.0.
+- **Fase 4 (Business Logic Modules)**: `ModKoneksi.vb`, `ModSesi.vb`, `ModErrorHandler.vb`, dan `ModAutoNumber.vb`.
+- **Fase 5 (Form Login - `frmLogin`)**: Autentikasi hash SHA-256 dan perlindungan brute-force lock 5 kali gagal.
+- **Fase 6 (Form Menu Utama - `frmMenuUtama`)**: Shell navigasi dasbor dengan pemisahan peran (*role-based access*) Admin dan Owner.
+- **Fase 7 (Form Master Lapangan - `frmMasterLapangan`)**: CRUD data lapangan, pencegahan duplikasi, pencarian instan, dan soft delete.
+- **Fase 8 (Form Master Users - `frmMasterUsers`)**: CRUD pengguna kasir/admin oleh Owner, proteksi penghapusan diri sendiri, dan enkripsi password.
+
+</details>

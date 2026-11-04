@@ -1,102 +1,78 @@
-# PRD — SIPELA (Sistem Pemesanan Lapangan Arung Futsal)
+# PRD — Product Requirements Document: SIPELA (Sistem Informasi Pemesanan Arung Futsal)
 
-> **Versi**: 1.0 — Week 10 Deliverable  
+> **Versi**: 2.0 — Full Operational System Scope  
 > **Tanggal**: 4 November 2026  
-> **Mata Kuliah**: Pemrograman Desktop — Semester 3  
-> **Dosen**: Tri Luhur Indayanti Sugata, S.ST, M.IM.  
-> **Kelompok International**:
-> 1. Helder Abel Freitas (25082010277)
-> 2. Ifaliantsoa Shearia Yiska F. (25082010278)
-> 3. Dhiaurrahman Rabbani Harianto (25082010042)
+> **Mata Kuliah**: Pemrograman Desktop — Semester 3 (UPN "Veteran" Jawa Timur)  
+> **Status**: Perencanaan Sistem Operasional Penuh
 
 ---
 
-## 1. Latar Belakang
+## 1. Latar Belakang & Masalah Bisnis
 
-Arung Futsal adalah usaha penyewaan lapangan futsal yang beroperasi setiap hari pukul 08.00–00.00 dengan durasi sewa per slot 1 jam. Proses pemesanan saat ini 100% manual (WhatsApp + buku fisik), menyebabkan:
+Arung Futsal adalah unit bisnis penyewaan lapangan futsal yang beroperasi setiap hari dari pukul **08.00 hingga 24.00** (total 16 slot waktu per lapangan per hari). Berdasarkan observasi lapangan dan *data-driven research* (ekstraksi ulasan Google Maps Arung Futsal):
+- **Masalah Pencatatan Manual**: Proses pemesanan yang sebelumnya bertumpu pada chat WhatsApp dan pencatatan buku fisik kerap menimbulkan kesalahan manusia (*human error*), seperti hilangnya nama pemesan dan terjadinya tabrakan jadwal (*double booking*).
+- **Ketidakpastian Finansial**: Uang Muka (DP) dan pelunasan tidak tercatat secara terpadu, menyulitkan kasir untuk melacak status piutang sewa.
+- **Kesulitan Rekapitulasi Pemilik**: Pemilik (*Owner*) kesulitan memantau pergerakan omzet harian, pendapatan bulanan, dan tingkat utilisasi (*okupansi*) lapangan secara *real-time*.
 
-- Nama pemesan hilang dan jadwal bentrok (double booking)
-- Pembayaran DP/pelunasan tidak tercatat terstruktur
-- Pemilik sulit memantau pendapatan dan okupansi
-
-**SIPELA** dirancang sebagai aplikasi desktop VB.NET Windows Forms untuk memusatkan pencatatan jadwal, pemesanan, pembayaran, dan pelaporan.
-
----
-
-## 2. Scope Week 10
-
-> [!IMPORTANT]
-> Dokumen ini hanya mencakup **deliverable Week 10** dari keseluruhan rancangan SIPELA.
-
-### 2.1 Yang Dikerjakan (In Scope)
-
-| # | Deliverable | Deskripsi |
-|---|-------------|-----------|
-| 1 | **Database Design (ERD)** | Finalisasi ERD dengan tabel, PK, FK, dan relasi |
-| 2 | **Database Implementation** | Skrip SQL MySQL (`arung_futsal.sql`) lengkap dengan tabel, constraint, stored procedure, view, dan sample data |
-| 3 | **Database Connection** | Modul koneksi reusable (`ModKoneksi.vb`) dengan error handling |
-| 4 | **Master Data Form 1 — Lapangan** | `frmMasterLapangan`: CRUD lapangan (nama, jenis lantai, harga per jam), DataGridView, auto-numbering, validasi input |
-| 5 | **Master Data Form 2 — Users** | `frmMasterUsers`: CRUD akun pengguna (username, password, nama lengkap, role), DataGridView, auto-numbering, validasi, ComboBox role |
-| 6 | **Form Login** | `frmLogin`: autentikasi username + password hash SHA-256, routing berdasarkan role |
-| 7 | **Menu Utama** | `frmMenuUtama`: navigasi menu berdasarkan role (Admin/Owner) |
-| 8 | **Source Code** | Project VB.NET Windows Forms (.NET 10) |
-
-### 2.2 Yang TIDAK Dikerjakan (Out of Scope Week 10)
-
-- Form Pemesanan (`frmPemesanan`)
-- Form Pembayaran (`frmPembayaran`)
-- Form Kalender Jadwal (`frmJadwal`)
-- Form Laporan (`frmLaporan`)
-- RDLC Report
-- Aplikasi mobile
-- Payment Gateway
-- Ekspor Excel
-
-### 2.3 Catatan Khusus: `frmMasterUsers`
-
-Di laporan asli, manajemen akun pengguna disebutkan "akun dibuat langsung di database". Untuk memenuhi requirement Week 10 (minimal 2 master data form), kita menambahkan `frmMasterUsers` sebagai form master kedua. Form ini:
-
-- Hanya diakses oleh **Owner**
-- CRUD: tambah, ubah, nonaktifkan akun (bukan hapus, untuk menjaga integritas data)
-- Menggunakan **ComboBox** untuk pilihan role (Admin/Owner) — memenuhi requirement assignment
-- Password disimpan sebagai hash **SHA-256**
-- Auto-numbering untuk user ID
-
-> [!NOTE]
-> Pada rancangan SIPELA final, fitur ini mungkin dihapus atau diubah. Untuk sekarang, ini berfungsi sebagai deliverable akademik Week 10.
+**SIPELA** hadir sebagai sistem operasional desktop berbasis **VB.NET Windows Forms (.NET 10)** dan **MySQL** yang memusatkan seluruh rantai operasional harian kasir dan manajemen pemilik.
 
 ---
 
-## 3. Aktor / Pengguna
+## 2. Persona Pengguna
 
-| Aktor | Peran pada Week 10 |
-|-------|---------------------|
-| **Owner** | Login; kelola master lapangan (CRUD); kelola master users (CRUD); navigasi menu |
-| **Admin** | Login; lihat data lapangan (read-only atau sesuai keputusan); navigasi menu |
+### Persona 1: Pak Faiz (Pemilik Bisnis / Owner)
+- **Profil**: Pemilik Arung Futsal, memiliki wewenang tertinggi.
+- **Kebutuhan**: Memantau ringkasan pendapatan bulanan, analisis pertumbuhan Month-over-Month (MoM), tingkat okupansi lapangan, serta mengontrol tarif sewa lapangan dan akun staf operasional.
+- **Akses**: Penuh ke seluruh modul (Master Lapangan, Master Users, Jadwal, Laporan & Analitik).
 
----
+### Persona 2: Admin / Kasir Operasional
+- **Profil**: Staf yang bertugas di meja operasional lapangan.
+- **Kebutuhan**: Antarmuka kasir yang cepat (*tactile & responsive*), kemudahan memeriksa ketersediaan slot kosong, mencatat pemesanan walk-in/telepon tanpa risiko bentrok, memproses pembayaran DP/pelunasan, dan mencetak struk sewa resmi.
+- **Akses**: Transaksi Pemesanan, Kasir Pembayaran, Kalender Jadwal, dan Cetak Nota. Dibatasi dari pengubahan akun staf lain dan laporan laba bersih.
 
-## 4. Aturan Bisnis (Week 10)
-
-| Aturan | Detail |
-|--------|--------|
-| Jam operasional | 08:00–00:00 (16 slot per lapangan per hari) |
-| Durasi slot | 1 jam |
-| Harga | Per jam, dicatat per lapangan |
-| Password | SHA-256 hash, bukan plaintext |
-| Login lock | Akun dikunci sementara setelah 5x gagal login berturut-turut |
-| Soft delete | Lapangan dan Users dinonaktifkan (`is_active = FALSE`), bukan dihapus |
-| Auto-numbering | ID otomatis untuk kode yang membutuhkan format khusus |
+### Persona 3: Pelanggan (Mas Migon / Tim Futsal)
+- **Profil**: Komunitas futsal yang menyewa lapangan secara berkala.
+- **Kebutuhan**: Kepastian slot waktu yang transparan, bukti tanda terima pembayaran DP/lunas resmi, serta kepastian bahwa lapangan tidak akan diserobot tim lain.
 
 ---
 
-## 5. Keberhasilan (Success Criteria Week 10)
+## 3. Ruang Lingkup Sistem Operasional Penuh
 
-- [ ] Database MySQL `arung_futsal` berhasil dibuat dan berisi sample data
-- [ ] Koneksi VB.NET ke MySQL berhasil, error handling berjalan
-- [ ] `frmMasterLapangan` — CRUD lengkap, validasi, auto-number, DataGridView
-- [ ] `frmMasterUsers` — CRUD lengkap, validasi, ComboBox role, DataGridView
-- [ ] `frmLogin` — autentikasi berhasil, routing ke menu sesuai role
-- [ ] `frmMenuUtama` — menu tampil sesuai role
-- [ ] Semua form bisa di-demo dalam video
+### 3.1 Fitur Inti yang Diimplementasikan (In-Scope)
 
+| Modul | Deskripsi Fungsional | Aktor |
+|-------|----------------------|-------|
+| **Autentikasi & Sesi** | Login terenkripsi SHA-256, deteksi brute-force (kunci akun 15 menit jika 5x salah), dan hak akses berbasis peran (*Role-Based Access Control*). | Admin, Owner |
+| **Master Lapangan** | Pengelolaan data lapangan (nama, jenis lantai: vinyl/rumput sintetis, tarif per jam), validasi keunikan, dan soft-delete. | Owner |
+| **Master Users** | Pengelolaan akun staf kasir dan pemilik dengan ComboBox peran serta proteksi penghapusan diri sendiri. | Owner |
+| **Pemesanan Lapangan** | Input data pemesan, penomoran kode booking otomatis (`BKG-YYYYMMDD-XXXX`), pemilihan slot visual 08.00–24.00, kalkulasi total dan DP minimal 30%, serta penegakan anti-double booking. | Admin, Owner |
+| **Kasir & Pembayaran** | Pencarian tagihan booking, pembayaran DP & Pelunasan, kalkulasi uang kembali, penomoran transaksi (`PAY-YYYYMMDD-XXXX`), dan cetak nota fisik. | Admin, Owner |
+| **Kalender Matriks Jadwal** | Tampilan visual grid ketersediaan seluruh lapangan per jam dengan indikator warna tegas (Tersedia, Terisi, Menunggu DP). | Admin, Owner |
+| **Laporan & Analitik** | Dasbor pendapatan bulanan, grafik okupansi lapangan, perbandingan MoM, dan ekspor data tabular ke spreadsheet (CSV/Excel). | Owner |
+| **Auto-Expiration Engine** | Routine otomatis untuk mendeteksi dan membatalkan pemesanan yang tidak dibayar dalam batas waktu 15 menit. | Sistem |
+
+### 3.2 Roadmap Masa Depan (Post-MVP)
+- **Modul Open Sparring (`frmOpenSparring`)**:
+  - DFD Level 0 Proses 4.0 mengidentifikasi kebutuhan pencarian lawan tanding antar tim futsal. Fitur ini dicatat untuk fase lanjutan setelah sistem kasir dan pencatatan operasional utama teruji secara stabil.
+
+---
+
+## 4. Aturan Bisnis (Business Rules)
+
+1. **Jam Operasional**: Lapangan beroperasi pukul 08.00 hingga 24.00 (slot dimulai dari jam 08.00, 09.00, ..., 23.00). Slot di luar jam ini tidak dapat dipesan.
+2. **Durasi Slot**: Durasi minimum sewa adalah 1 jam per slot, dengan kelipatan slot penuh per jam.
+3. **Ketentuan Uang Muka (DP)**:
+   - DP minimal adalah **30%** dari total biaya sewa lapangan.
+   - Waktu tunggu pembayaran DP maksimal adalah **15 menit** sejak transaksi pemesanan dibuat. Jika melewati batas, pemesanan dinyatakan `Kedaluwarsa` dan slot dilepas kembali.
+4. **Anti-Double Booking**: Satu slot pada satu lapangan di satu tanggal hanya boleh dialokasikan ke tepat satu pemesanan aktif (ditegakkan via database unique constraint `uq_slot_aktif`).
+5. **Pelunasan**: Pelunasan sisa 70% dapat dilakukan sebelum waktu kickoff pemesanan.
+6. **Integritas Transaksi**: Pemesanan yang telah memiliki catatan pembayaran tidak dapat dihapus sembarangan untuk menjaga keabsahan rekap audit keuangan.
+
+---
+
+## 5. Kebutuhan Non-Fungsional (NFR)
+
+- **Keamanan (Security)**: Password disimpan dalam bentuk hash SHA-256. Komunikasi database menggunakan *parameterized queries* untuk mencegah ancaman SQL Injection.
+- **Responsivitas UI (Performance)**: Antarmuka merespons klik dan peralihan tab dalam waktu di bawah 1 detik di sistem operasi Windows 11.
+- **Kenyamanan Visual (Ergonomics)**: Mengusung tema visual **Tactile Claymorphism + Neo-Brutalism** dengan kontras tinggi (Cream `#FDFBF7` dan Slate `#2D334A`), tombol taktil, serta penanda warna status yang intuitif bagi operator kasir.
+- **Keandalan Data (Reliability)**: 0 toleransi double-booking berkat transaksi atomik pada level database engine MySQL InnoDB.

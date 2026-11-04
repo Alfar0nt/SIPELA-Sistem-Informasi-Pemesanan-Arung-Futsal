@@ -1,218 +1,151 @@
-# APP-FLOW — Application Flow
+# APP-FLOW — Application Flow & User Journeys
 
-> **Versi**: 1.0 — Week 10 Deliverable  
+> **Versi**: 2.0 — Full Operational Architecture  
 > **Tanggal**: 4 November 2026
 
 ---
 
-## 1. Alur Utama Aplikasi (Week 10)
+## 1. Alur Navigasi Utama Sistem
 
 ```mermaid
 flowchart TD
-    A["App Start"] --> B["frmLogin"]
-    B --> C{"Login berhasil?"}
-    C -->|Tidak| D["Tampilkan error / Lock akun"]
-    D --> B
-    C -->|Ya - Owner| E["frmMenuUtama (Owner)"]
-    C -->|Ya - Admin| F["frmMenuUtama (Admin)"]
+    Start(["Aplikasi Dimulai"]) --> Login["frmLogin"]
+    Login --> AuthCheck{"Autentikasi Berhasil?"}
+    AuthCheck -->|Gagal 5x berturut-turut| Lockout["Akun Terkunci 15 Menit"]
+    Lockout --> Login
+    AuthCheck -->|Gagal < 5x| ErrMsg["Tampilkan Pesan Error"] --> Login
     
-    E --> G["Menu: Master Lapangan"]
-    E --> H["Menu: Master Users"]
-    E --> I["Menu: Jadwal (future)"]
-    E --> J["Menu: Laporan (future)"]
-    E --> K["Logout → frmLogin"]
+    AuthCheck -->|Berhasil| Sesi["Inisialisasi ModSesi"]
+    Sesi --> MenuUtama["frmMenuUtama (Dasbor Taktil)"]
     
-    F --> L["Menu: Pemesanan (future)"]
-    F --> M["Menu: Pembayaran (future)"]
-    F --> N["Menu: Jadwal (future)"]
-    F --> O["Menu: Riwayat (future)"]
-    F --> P["Logout → frmLogin"]
+    MenuUtama -->|Cek Peran| RoleCheck{"Peran Pengguna?"}
     
-    G --> Q["frmMasterLapangan"]
-    H --> R["frmMasterUsers"]
+    RoleCheck -->|Owner| OwnerNav["Akses Penuh: Master Lapangan, Master Users, Jadwal, Pemesanan, Pembayaran, Laporan"]
+    RoleCheck -->|Admin/Kasir| AdminNav["Akses Operasional: Jadwal, Pemesanan, Pembayaran, Cetak Nota (Master Lapangan & Users dibatasi)"]
+    
+    OwnerNav --> ModLap["frmMasterLapangan"]
+    OwnerNav --> ModUser["frmMasterUsers"]
+    OwnerNav --> ModLapView["frmLaporan"]
+    
+    AdminNav --> ModBkg["frmPemesanan"]
+    AdminNav --> ModPay["frmPembayaran"]
+    AdminNav --> ModSch["frmJadwal"]
+    
+    OwnerNav --> ModBkg
+    OwnerNav --> ModPay
+    OwnerNav --> ModSch
+
+    MenuUtama --> Logout["Logout"] --> Login
 ```
 
 ---
 
-## 2. Alur Login (`frmLogin`)
+## 2. Alur Transaksi Pemesanan (`frmPemesanan`)
 
 ```mermaid
 flowchart TD
-    A["User input username + password"] --> B{"Field kosong?"}
-    B -->|Ya| C["MessageBox: field wajib diisi"]
-    C --> A
-    B -->|Tidak| D["Query user by username"]
-    D --> E{"User ditemukan?"}
-    E -->|Tidak| F["MessageBox: username/password salah"]
-    F --> A
-    E -->|Ya| G{"Akun aktif?"}
-    G -->|Tidak| H["MessageBox: akun nonaktif"]
-    H --> A
-    G -->|Ya| I{"Akun terkunci?"}
-    I -->|Ya, belum expired| J["MessageBox: akun terkunci, coba lagi setelah X menit"]
-    J --> A
-    I -->|Tidak / sudah expired| K["Hash input password dengan SHA-256"]
-    K --> L{"Hash cocok?"}
-    L -->|Tidak| M["Increment gagal_login"]
-    M --> N{"gagal_login >= 5?"}
-    N -->|Ya| O["Set terkunci_sampai = NOW() + 15 menit"]
-    O --> P["MessageBox: akun dikunci 15 menit"]
-    P --> A
-    N -->|Tidak| F
-    L -->|Ya| Q["Reset gagal_login = 0"]
-    Q --> R["Simpan ke ModSesi: id, username, nama, role"]
-    R --> S["Hide frmLogin"]
-    S --> T["Show frmMenuUtama"]
+    OpenBkg["Buka frmPemesanan"] --> InitBkg["Generate Kode Booking Otomatis (ModAutoNumber) & Set Default Tanggal Hari Ini"]
+    InitBkg --> InputCust["Admin Mengisi: Nama Pemesan, No WhatsApp, Lapangan"]
+    InputCust --> SelectDate["Pilih Tanggal Main"]
+    SelectDate --> LoadSlots["Sistem Memuat Slot Jam 08.00 - 24.00 dari DB"]
+    
+    LoadSlots --> RenderGrid["Render Tombol Slot: Hijau (Tersedia), Merah (Terisi), Biru (Terpilih)"]
+    RenderGrid --> ClickSlot["Kasir Mengklik 1 atau Beberapa Slot Tersedia"]
+    
+    ClickSlot --> Calc{"Kalkulasi Real-time"}
+    Calc --> DisplayTotal["Hitung Total Durasi Jam<br>Hitung Total Sewa = Jam * Tarif<br>Hitung Minimal DP = 30% * Total Sewa<br>Set Batas Bayar = Waktu Dibuat + 15 Menit"]
+    
+    DisplayTotal --> ClickSave["Klik Tombol SIMPAN PEMESANAN"]
+    ClickSave --> ValidateFields{"Validasi Field Lengkap & Slot Tidak Kosong?"}
+    ValidateFields -->|Tidak| WarnField["Tampilkan Peringatan Validasi"] --> ClickSlot
+    
+    ValidateFields -->|Ya| CheckConflict{"Cek Ulang Ketersediaan Slot di DB"}
+    CheckConflict -->|Terisi Orang Lain| CollisionErr["Pemberitahuan: Slot baru saja dipesan pihak lain!"] --> LoadSlots
+    
+    CheckConflict -->|Aman| DBTrans["Buka MySQL Transaction:<br>1. INSERT pemesanan (status: Menunggu DP)<br>2. INSERT detail_pemesanan (loop slot jam)"]
+    DBTrans --> TransSuccess{"Transaksi Sukses?"}
+    TransSuccess -->|Gagal| Rollback["Rollback Transaksi & Tampilkan Error"]
+    TransSuccess -->|Berhasil| Commit["Commit Transaksi"]
+    Commit --> PromptNext{"Ingin Langsung Proses Pembayaran DP?"}
+    PromptNext -->|Ya| OpenPayDirect["Buka frmPembayaran dengan Kode Booking Terpilih"]
+    PromptNext -->|Tidak| DoneBkg["Reset Form / Kembali ke Jadwal"]
 ```
-
-### Detail Validasi Login
-
-| Step | Validasi | Aksi Gagal |
-|------|----------|-----------|
-| 1 | Username dan password tidak boleh kosong | MessageBox warning |
-| 2 | Cari user berdasarkan username (case-insensitive) | "Username atau password salah" |
-| 3 | Cek `is_active = TRUE` | "Akun tidak aktif, hubungi Owner" |
-| 4 | Cek `terkunci_sampai` < NOW() atau NULL | "Akun terkunci, coba lagi setelah X menit" |
-| 5 | Bandingkan SHA-256 hash | "Username atau password salah" + increment gagal |
-| 6 | Jika `gagal_login >= 5` → kunci 15 menit | Set `terkunci_sampai` |
-| 7 | Login berhasil → reset `gagal_login`, set session | Redirect ke Menu Utama |
 
 ---
 
-## 3. Alur Menu Utama (`frmMenuUtama`)
+## 3. Alur Kasir & Pembayaran (`frmPembayaran`)
+
+```mermaid
+flowchart TD
+    OpenPay["Buka frmPembayaran"] --> FindBooking["Cari Berdasarkan Kode Booking atau Nama Pemesan"]
+    FindBooking --> QueryBkg["Query Data Pemesanan & Detail Sewa"]
+    QueryBkg --> Found{"Data Ditemukan?"}
+    Found -->|Tidak| NotFoundMsg["Pemberitahuan: Data tidak ditemukan"] --> FindBooking
+    
+    Found -->|Ya| CheckStatus{"Status Saat Ini?"}
+    CheckStatus -->|Lunas| InfoLunas["Tagihan sudah lunas. Sediakan opsi Cetak Ulang Nota"]
+    CheckStatus -->|Kedaluwarsa| InfoExpired["Pemesanan kedaluwarsa karena melewati batas bayar"]
+    CheckStatus -->|Menunggu DP| ModeDP["Set Mode Pembayaran = DP (Min. 30%)"]
+    CheckStatus -->|DP Terbayar| ModePelunasan["Set Mode Pembayaran = Pelunasan (Sisa 70%)"]
+    
+    ModeDP --> SelectMethod["Pilih Metode: Tunai / QRIS / Transfer"]
+    ModePelunasan --> SelectMethod
+    
+    SelectMethod --> InputAmount["Kasir Menginput Jumlah Diterima"]
+    InputAmount --> CheckCash{"Metode Tunai?"}
+    CheckCash -->|Ya| CalcChange["Hitung Kembalian = Diterima - Tagihan"]
+    CheckCash -->|Tidak| ConfirmNonCash["Konfirmasi Mutasi / Bukti Transfer"]
+    
+    CalcChange --> ProcessPay["Klik PROSES PEMBAYARAN"]
+    ConfirmNonCash --> ProcessPay
+    
+    ProcessPay --> ExecPay["Buka Transaksi Database:<br>1. INSERT ke pembayaran (no_transaksi PAY-...)<br>2. UPDATE pemesanan (status: DP Terbayar / Lunas)"]
+    ExecPay --> PayDone["Pembayaran Berhasil Dicatat"]
+    PayDone --> PrintDialog["Buka Dialog Cetak Nota (frmNotaPreview)"]
+    PrintDialog --> PrintPhysical["Cetak Struk ke Printer Kasir / Simpan Bukti"]
+```
+
+---
+
+## 4. Alur Kalender Matriks Jadwal (`frmJadwal`)
 
 ```mermaid
 flowchart LR
-    A["frmMenuUtama"] --> B{"ModSesi.Role?"}
-    B -->|Owner| C["Enable: Master Lapangan, Master Users, Jadwal*, Laporan*"]
-    B -->|Admin| D["Enable: Pemesanan*, Pembayaran*, Jadwal*, Riwayat*"]
-    C --> E["Disable: Pemesanan*, Pembayaran*, Riwayat*"]
-    D --> F["Disable: Master Lapangan, Master Users, Laporan*"]
+    OpenJadwal["Buka frmJadwal"] --> PickDate["Pilih Tanggal Jadwal"]
+    PickDate --> FetchSlots["Query view v_jadwal_lapangan"]
+    FetchSlots --> BuildMatrix["Bangun Matriks Visual (Baris: Jam 08-24, Kolom: Lapangan)"]
+    BuildMatrix --> UserClick{"Pengguna Mengklik Sel"}
+    UserClick -->|Slot Terisi| ShowDetail["Tampilkan Pop-up Info Pemesan & Kontak"]
+    UserClick -->|Slot Kosong| QuickBooking["Navigasi Cepat ke frmPemesanan dengan Slot Terpilih Otomatis"]
 ```
-
-> *Bertanda asterisk (\*) = form belum dibuat di Week 10, menu tampil tapi disabled/placeholder*
-
-### Menu Mapping
-
-| Menu Item | Owner | Admin | Form Target | Status Week 10 |
-|-----------|-------|-------|-------------|----------------|
-| Master Lapangan | ✅ Enabled | ❌ Disabled | `frmMasterLapangan` | ✅ Implementasi |
-| Master Users | ✅ Enabled | ❌ Disabled | `frmMasterUsers` | ✅ Implementasi |
-| Pemesanan | ❌ Disabled | ✅ Enabled | `frmPemesanan` | ⏳ Future |
-| Pembayaran | ❌ Disabled | ✅ Enabled | `frmPembayaran` | ⏳ Future |
-| Jadwal | ✅ Enabled | ✅ Enabled | `frmJadwal` | ⏳ Future |
-| Laporan | ✅ Enabled | ❌ Disabled | `frmLaporan` | ⏳ Future |
-| Riwayat | ❌ Disabled | ✅ Enabled | `frmLaporan` | ⏳ Future |
-| Logout | ✅ Enabled | ✅ Enabled | → `frmLogin` | ✅ Implementasi |
 
 ---
 
-## 4. Alur CRUD Master Lapangan (`frmMasterLapangan`)
+## 5. Alur Laporan & Analitik Bisnis (`frmLaporan`)
 
 ```mermaid
 flowchart TD
-    A["Form Load"] --> B["Load DataGridView dari tabel lapangan"]
-    A --> C["Set field read-only / default values"]
+    OpenLaporan["Buka frmLaporan (Khusus Owner)"] --> SelectFilter["Pilih Periode: Bulan & Tahun"]
+    SelectFilter --> RunQueries["Query v_laporan_bulanan & v_okupansi_bulanan"]
+    RunQueries --> RenderMetrics["Perbarui 3 Stat Cards:<br>1. Total Omzet Rupiah<br>2. Tingkat Okupansi %<br>3. Pertumbuhan MoM %"]
+    RenderMetrics --> FillGrid["Populasi DataGridView dengan Rincian Transaksi"]
     
-    subgraph CRUD
-        D["Tambah Lapangan"]
-        E["Ubah Lapangan"]
-        F["Nonaktifkan Lapangan"]
-        G["Bersihkan Form"]
-    end
-    
-    D --> D1["Validasi input"]
-    D1 --> D2{"Valid?"}
-    D2 -->|Tidak| D3["Tampilkan error validasi"]
-    D2 -->|Ya| D4["INSERT ke tabel lapangan"]
-    D4 --> D5["Refresh DataGridView"]
-    D5 --> D6["Bersihkan form"]
-    
-    E --> E1["Pilih baris di DataGridView"]
-    E1 --> E2["Populate field dengan data terpilih"]
-    E2 --> E3["Edit field"]
-    E3 --> E4["Validasi input"]
-    E4 --> E5{"Valid?"}
-    E5 -->|Tidak| E6["Tampilkan error validasi"]
-    E5 -->|Ya| E7["UPDATE tabel lapangan"]
-    E7 --> E8["Refresh DataGridView"]
-    
-    F --> F1["Pilih baris di DataGridView"]
-    F1 --> F2["Konfirmasi nonaktifkan"]
-    F2 --> F3["UPDATE is_active = FALSE"]
-    F3 --> F4["Refresh DataGridView"]
+    FillGrid --> ExportOpt{"Pilihan Aksi"}
+    ExportOpt -->|Ekspor Excel/CSV| GenCSV["Format Data Tabular ke Format CSV / Excel"] --> SaveFile["Simpan ke File Lokal"]
+    ExportOpt -->|Cetak Ringkasan| GenReportView["Pratinjau Cetak Lembar Rekap Bulanan"]
 ```
-
-### Validasi Master Lapangan
-
-| Field | Validasi | Pesan Error |
-|-------|----------|-------------|
-| Nama Lapangan | Wajib diisi, unik | "Nama lapangan wajib diisi" / "Nama lapangan sudah ada" |
-| Jenis Lantai | Wajib diisi | "Jenis lantai wajib diisi" |
-| Harga per Jam | Wajib > 0 | "Harga per jam harus lebih dari 0" |
 
 ---
 
-## 5. Alur CRUD Master Users (`frmMasterUsers`)
+## 6. Alur Background Maintenance (Auto-Expiration)
 
 ```mermaid
 flowchart TD
-    A["Form Load"] --> B["Load DataGridView dari tabel users"]
-    A --> C["Set field defaults, ComboBox role"]
-    
-    subgraph CRUD
-        D["Tambah User"]
-        E["Ubah User"]
-        F["Nonaktifkan User"]
-        G["Bersihkan Form"]
-    end
-    
-    D --> D1["Validasi input"]
-    D1 --> D2{"Valid?"}
-    D2 -->|Tidak| D3["Tampilkan error validasi"]
-    D2 -->|Ya| D4["Hash password SHA-256"]
-    D4 --> D5["INSERT ke tabel users"]
-    D5 --> D6["Refresh DataGridView"]
-    
-    E --> E1["Pilih baris di DataGridView"]
-    E1 --> E2["Populate field (password kosong)"]
-    E2 --> E3["Edit field"]
-    E3 --> E4["Validasi input"]
-    E4 --> E5{"Password diisi?"}
-    E5 -->|Ya| E6["Hash password baru"]
-    E5 -->|Tidak| E7["Pertahankan hash lama"]
-    E6 --> E8["UPDATE tabel users"]
-    E7 --> E8
-    E8 --> E9["Refresh DataGridView"]
-    
-    F --> F1["Pilih baris di DataGridView"]
-    F1 --> F2{"User sendiri?"}
-    F2 -->|Ya| F3["MessageBox: tidak bisa nonaktifkan diri sendiri"]
-    F2 -->|Tidak| F4["Konfirmasi nonaktifkan"]
-    F4 --> F5["UPDATE is_active = FALSE"]
-    F5 --> F6["Refresh DataGridView"]
+    TimerTick["Background Timer Berdetak (Setiap 60 Detik)"] --> CheckExp["Panggil Stored Procedure sp_kedaluwarsakan_pemesanan()"]
+    CheckExp --> FindOverdue["Identifikasi Pemesanan status 'Menunggu DP' dengan batas_bayar < NOW()"]
+    FindOverdue --> AnyOverdue{"Ada Data yang Melewati Batas?"}
+    AnyOverdue -->|Tidak| Sleep["Tidur hingga Detak Timer Berikutnya"]
+    AnyOverdue -->|Ya| UpdateStatus["UPDATE status pemesanan = 'Kedaluwarsa'<br>UPDATE detail_pemesanan SET aktif = NULL"]
+    UpdateStatus --> ReleaseSlots["Slot Waktu Otomatis Terlepas & Tersedia Kembali di Jadwal"]
+    ReleaseSlots --> Sleep
 ```
-
-### Validasi Master Users
-
-| Field | Validasi | Pesan Error |
-|-------|----------|-------------|
-| Username | Wajib diisi, min 4 karakter, unik | "Username wajib diisi" / "Username minimal 4 karakter" / "Username sudah digunakan" |
-| Password | Wajib diisi saat tambah baru, min 6 karakter | "Password wajib diisi" / "Password minimal 6 karakter" |
-| Nama Lengkap | Wajib diisi | "Nama lengkap wajib diisi" |
-| Role | Wajib dipilih dari ComboBox | "Pilih role pengguna" |
-| Nonaktifkan diri | Tidak boleh nonaktifkan akun sendiri | "Tidak dapat menonaktifkan akun Anda sendiri" |
-
----
-
-## 6. Alur Logout
-
-```mermaid
-flowchart LR
-    A["Klik Logout"] --> B["Konfirmasi: Yakin ingin logout?"]
-    B -->|Tidak| C["Kembali ke menu"]
-    B -->|Ya| D["ModSesi.Logout()"]
-    D --> E["Close frmMenuUtama"]
-    E --> F["Show frmLogin"]
-```
-

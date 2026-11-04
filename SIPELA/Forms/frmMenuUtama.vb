@@ -27,6 +27,9 @@ Namespace Forms
                 btnMasterLapangan.Enabled = False
                 btnMasterUsers.Enabled = False
             End If
+
+            ' Menu transaksi pemesanan dapat diakses oleh Admin maupun Owner
+            btnPemesanan.Enabled = True
         End Sub
 
         Private Sub btnMasterLapangan_Click(sender As Object, e As EventArgs) Handles btnMasterLapangan.Click
@@ -40,10 +43,8 @@ Namespace Forms
         End Sub
 
         Private Sub btnPemesanan_Click(sender As Object, e As EventArgs) Handles btnPemesanan.Click
-            ModErrorHandler.TampilkanInfo(
-                "Fitur Transaksi Pemesanan sedang disiapkan untuk tahap berikutnya (Week 11/Final Project).",
-                "Fitur Mendatang"
-            )
+            Dim formPemesanan As New frmPemesanan()
+            formPemesanan.ShowDialog(Me)
         End Sub
 
         Private Sub btnPembayaran_Click(sender As Object, e As EventArgs) Handles btnPembayaran.Click
