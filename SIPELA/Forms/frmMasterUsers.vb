@@ -5,6 +5,7 @@ Imports System
 Imports System.Data
 Imports System.Windows.Forms
 Imports MySql.Data.MySqlClient
+Imports SIPELA.Modules
 
 Namespace Forms
 
@@ -37,6 +38,13 @@ Namespace Forms
             dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             dgvUsers.RowHeadersVisible = False
             dgvUsers.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(245, 245, 250)
+
+            ' Terapkan style icon dan text relation sesuai ketentuan penugasan
+            ModUIHelper.TerapkanStyleTombol(btnSimpan, "insert.png")
+            ModUIHelper.TerapkanStyleTombol(btnUbah, "update.png")
+            ModUIHelper.TerapkanStyleTombol(btnHapus, "deactivate.png")
+            ModUIHelper.TerapkanStyleTombol(btnHapusPermanen, "delete.png")
+            ModUIHelper.TerapkanStyleTombol(btnBersihkan, "clear.png")
         End Sub
 
         Private Sub MuatDataUsers()
@@ -102,6 +110,7 @@ Namespace Forms
             btnSimpan.Enabled = True
             btnUbah.Enabled = False
             btnHapus.Enabled = False
+            btnHapusPermanen.Enabled = False
 
             dgvUsers.ClearSelection()
             txtUsername.Focus()
@@ -308,6 +317,71 @@ Namespace Forms
             End Try
         End Sub
 
+        Private Sub btnHapusPermanen_Click(sender As Object, e As EventArgs) Handles btnHapusPermanen.Click
+            If _idTerpilih <= 0 Then
+                ModErrorHandler.TampilkanPeringatan("Pilih pengguna dari tabel terlebih dahulu.", "Pilih Data")
+                Return
+            End If
+
+            If _idTerpilih = ModSesi.IdUser Then
+                ModErrorHandler.TampilkanPeringatan("Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif login.", "Aksi Ditolak")
+                Return
+            End If
+
+            Dim user As String = txtUsername.Text.Trim()
+            Dim pesan As String = String.Format(
+                "PERINGATAN: Apakah Anda yakin ingin MENGHAPUS PERMANEN (HARD DELETE) akun '{0}' dari database?{1}Tindakan ini tidak dapat dibatalkan!",
+                user, Environment.NewLine)
+
+            If MessageBox.Show(pesan, "Konfirmasi Hapus Permanen Akun", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) <> DialogResult.Yes Then
+                Return
+            End If
+
+            Try
+                Using conn As MySqlConnection = ModKoneksi.BukaKoneksi()
+                    ' Pengecekan relasi foreign key pada tabel pemesanan dan pembayaran
+                    Const sqlCekBooking As String = "SELECT COUNT(*) FROM pemesanan WHERE id_user = @id"
+                    Using cmdCek As New MySqlCommand(sqlCekBooking, conn)
+                        cmdCek.Parameters.AddWithValue("@id", _idTerpilih)
+                        Dim countBooking As Long = Convert.ToInt64(cmdCek.ExecuteScalar())
+                        If countBooking > 0 Then
+                            ModErrorHandler.TampilkanPeringatan(
+                                String.Format("Pengguna '{0}' tidak dapat dihapus permanen karena tercatat dalam {1} transaksi pemesanan.{2}Silakan gunakan tombol Nonaktifkan (Soft Delete) untuk menonaktifkan akun tersebut.", user, countBooking, Environment.NewLine),
+                                "Integritas Data Terproteksi"
+                            )
+                            Return
+                        End If
+                    End Using
+
+                    Const sqlCekBayar As String = "SELECT COUNT(*) FROM pembayaran WHERE id_user = @id"
+                    Using cmdCek As New MySqlCommand(sqlCekBayar, conn)
+                        cmdCek.Parameters.AddWithValue("@id", _idTerpilih)
+                        Dim countBayar As Long = Convert.ToInt64(cmdCek.ExecuteScalar())
+                        If countBayar > 0 Then
+                            ModErrorHandler.TampilkanPeringatan(
+                                String.Format("Pengguna '{0}' tidak dapat dihapus permanen karena tercatat dalam {1} transaksi pembayaran.{2}Silakan gunakan tombol Nonaktifkan (Soft Delete) untuk menonaktifkan akun tersebut.", user, countBayar, Environment.NewLine),
+                                "Integritas Data Terproteksi"
+                            )
+                            Return
+                        End If
+                    End Using
+
+                    ' Jalankan Hard Delete
+                    Const sqlDelete As String = "DELETE FROM users WHERE id_user = @id"
+                    Using cmdDelete As New MySqlCommand(sqlDelete, conn)
+                        cmdDelete.Parameters.AddWithValue("@id", _idTerpilih)
+                        cmdDelete.ExecuteNonQuery()
+                    End Using
+                End Using
+
+                ModErrorHandler.TampilkanInfo("Akun pengguna berhasil dihapus permanen dari database.", "Sukses")
+                MuatDataUsers()
+                BersihkanForm()
+            Catch ex As Exception
+                ModErrorHandler.TampilkanError("Gagal menghapus akun pengguna secara permanen", ex)
+            End Try
+        End Sub
+
         Private Sub btnBersihkan_Click(sender As Object, e As EventArgs) Handles btnBersihkan.Click
             BersihkanForm()
         End Sub
@@ -338,6 +412,7 @@ Namespace Forms
                 btnSimpan.Enabled = False
                 btnUbah.Enabled = True
                 btnHapus.Enabled = True
+                btnHapusPermanen.Enabled = True
             Catch ex As Exception
                 ModErrorHandler.TampilkanError("Gagal memilih data pengguna dari tabel", ex)
             End Try

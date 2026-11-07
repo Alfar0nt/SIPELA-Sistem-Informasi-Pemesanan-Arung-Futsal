@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -31,6 +31,12 @@
 
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="26.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\Icons\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

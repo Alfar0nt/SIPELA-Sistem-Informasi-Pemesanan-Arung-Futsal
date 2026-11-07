@@ -109,6 +109,12 @@ SIPELA-Sistem-Informasi-Pemesanan-Arung-Futsal/
 | `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | — |
 | `updated_at` | DATETIME | ON UPDATE CURRENT_TIMESTAMP | — |
 
+#### `jenis_lantai` (Master Pendukung ComboBox)
+| Kolom | Tipe | Constraint | Keterangan |
+|-------|------|-----------|------------|
+| `id_jenis` | INT | PK, AUTO_INCREMENT | — |
+| `nama_jenis` | VARCHAR(50) | UNIQUE, NOT NULL | Rumput Sintetis, Vinyl, Interlock, dll |
+
 #### `lapangan`
 | Kolom | Tipe | Constraint | Keterangan |
 |-------|------|-----------|------------|

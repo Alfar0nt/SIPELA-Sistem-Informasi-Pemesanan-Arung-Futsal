@@ -111,44 +111,49 @@ Total **8 fase**, diurutkan berdasarkan dependensi. Seluruh fase 1 s.d. 8 telah 
 
 ## Fase 7: Form Master Lapangan (`frmMasterLapangan`)
 
-**Tujuan**: CRUD lapangan dengan DataGridView, validasi, dan pencarian
+**Tujuan**: CRUD lapangan dengan DataGridView, ComboBox terhubung database, validasi, soft & hard delete, dan icon tombol
 
 | # | Task | Detail | Status | File Output |
 |---|------|--------|--------|-------------|
-| 7.1 | Designer | Layout 940×575, Panel input kiri + DataGridView kanan, 4 button aksi, search bar | [x] Selesai | `SIPELA/Forms/frmMasterLapangan.Designer.vb` |
+| 7.1 | Designer | Layout 940×600, Panel input kiri + DataGridView kanan, 5 button aksi (Insert, Update, Nonaktifkan, Delete, Clear), search bar | [x] Selesai | `SIPELA/Forms/frmMasterLapangan.Designer.vb` |
 | 7.2 | Logic — Load | Muat DataGridView dari MySQL, set default input, format angka mata uang | [x] Selesai | `SIPELA/Forms/frmMasterLapangan.vb` |
-| 7.3 | Logic — Create | Validasi → Cek duplikasi nama → INSERT → refresh DataGridView → reset | [x] Selesai | ↑ |
-| 7.4 | Logic — Read | Klik baris di DataGridView → populate data ke form input → masuk mode Ubah | [x] Selesai | ↑ |
-| 7.5 | Logic — Update | Validasi → Cek duplikasi jika ganti nama → UPDATE → refresh DataGridView | [x] Selesai | ↑ |
-| 7.6 | Logic — Soft Delete | Konfirmasi → UPDATE `is_active = FALSE` → refresh DataGridView | [x] Selesai | ↑ |
-| 7.7 | Logic — Bersihkan | Reset field → mode Tambah (Simpan enabled, Ubah & Nonaktifkan disabled) | [x] Selesai | ↑ |
-| 7.8 | Logic — Cari | Filter DataView realtime berdasarkan keyword nama/jenis/status | [x] Selesai | ↑ |
-| 7.9 | Logic — Validasi | Nama wajib, jenis lantai wajib, harga > 0, nama unik | [x] Selesai | ↑ |
-| 7.10 | Logic — Kembali | Tutup dialog form → kembali ke `frmMenuUtama` | [x] Selesai | ↑ |
+| 7.3 | Logic — ComboBox DB | Muat data jenis lantai dinamis dari tabel `jenis_lantai` di database | [x] Selesai | ↑ |
+| 7.4 | Logic — Create | Validasi → Cek duplikasi nama → INSERT → refresh DataGridView → reset | [x] Selesai | ↑ |
+| 7.5 | Logic — Read | Klik baris di DataGridView → populate data ke form input → masuk mode Ubah | [x] Selesai | ↑ |
+| 7.6 | Logic — Update | Validasi → Cek duplikasi jika ganti nama → UPDATE → refresh DataGridView | [x] Selesai | ↑ |
+| 7.7 | Logic — Soft Delete | Konfirmasi → UPDATE `is_active = FALSE` → refresh DataGridView | [x] Selesai | ↑ |
+| 7.8 | Logic — Hard Delete | Konfirmasi Warning → Cek FK `detail_pemesanan` → DELETE FROM → refresh | [x] Selesai | ↑ |
+| 7.9 | Logic — Bersihkan | Reset field → mode Tambah (Insert enabled, Update/Delete/Nonaktifkan disabled) | [x] Selesai | ↑ |
+| 7.10 | Logic — Cari | Filter DataView realtime berdasarkan keyword nama/jenis/status | [x] Selesai | ↑ |
+| 7.11 | Logic — Validasi | Nama wajib, jenis lantai wajib, harga > 0, nama unik | [x] Selesai | ↑ |
+| 7.12 | Logic — Button Styles | Terapkan icon 16x16 PNG, MiddleCenter, MiddleRight, ImageBeforeText via `ModUIHelper` | [x] Selesai | ↑ |
+| 7.13 | Logic — Kembali | Tutup dialog form → kembali ke `frmMenuUtama` | [x] Selesai | ↑ |
 
-**Checkpoint**: CRUD Master Lapangan lengkap dengan validasi dan DataGridView berhasil dikompilasi. [x]
+**Checkpoint**: CRUD Master Lapangan lengkap dengan validasi, ComboBox DB, hard/soft delete, dan DataGridView berhasil dikompilasi. [x]
 
 ---
 
 ## Fase 8: Form Master Users (`frmMasterUsers`)
 
-**Tujuan**: CRUD user dengan DataGridView, ComboBox role, SHA-256, validasi
+**Tujuan**: CRUD user dengan DataGridView, ComboBox role, SHA-256, soft & hard delete, icon tombol, validasi
 
 | # | Task | Detail | Status | File Output |
 |---|------|--------|--------|-------------|
-| 8.1 | Designer | Layout 950×600, GroupBox input user + DataGridView, ComboBox role, 4 button aksi | [x] Selesai | `SIPELA/Forms/frmMasterUsers.Designer.vb` |
+| 8.1 | Designer | Layout 950×635, GroupBox input user + DataGridView, ComboBox role, 5 button aksi | [x] Selesai | `SIPELA/Forms/frmMasterUsers.Designer.vb` |
 | 8.2 | Logic — Load | Muat data pengguna, sembunyikan `password_hash`, isi opsi ComboBox role | [x] Selesai | `SIPELA/Forms/frmMasterUsers.vb` |
 | 8.3 | Logic — Create | Validasi → Hash SHA-256 password → INSERT → refresh DataGridView | [x] Selesai | ↑ |
 | 8.4 | Logic — Read | Klik baris → populate data (password dikosongkan untuk keamanan) → mode Ubah | [x] Selesai | ↑ |
 | 8.5 | Logic — Update | Validasi → Hash password baru jika diisi / pertahankan hash lama jika kosong → UPDATE | [x] Selesai | ↑ |
 | 8.6 | Logic — Soft Delete | Cek bukan user yang sedang aktif login → konfirmasi → UPDATE `is_active = FALSE` | [x] Selesai | ↑ |
-| 8.7 | Logic — Bersihkan | Reset semua field → mode Tambah | [x] Selesai | ↑ |
-| 8.8 | Logic — Cari | Filter realtime DataView berdasarkan username, nama lengkap, atau role | [x] Selesai | ↑ |
-| 8.9 | Logic — Validasi | Username min 4 karakter & unik, password min 6 karakter, nama lengkap wajib, role wajib | [x] Selesai | ↑ |
-| 8.10 | Logic — Kembali | Tutup dialog form → kembali ke menu utama | [x] Selesai | ↑ |
-| 8.11 | Logic — Kolom grid | Sembunyikan kolom sensitif `password_hash` dari DataGridView | [x] Selesai | ↑ |
+| 8.7 | Logic — Hard Delete | Cek bukan user aktif → Cek FK pemesanan/pembayaran → DELETE FROM | [x] Selesai | ↑ |
+| 8.8 | Logic — Bersihkan | Reset semua field → mode Tambah | [x] Selesai | ↑ |
+| 8.9 | Logic — Cari | Filter realtime DataView berdasarkan username, nama lengkap, atau role | [x] Selesai | ↑ |
+| 8.10 | Logic — Validasi | Username min 4 karakter & unik, password min 6 karakter, nama lengkap wajib, role wajib | [x] Selesai | ↑ |
+| 8.11 | Logic — Button Styles | Terapkan icon 16x16 PNG, MiddleCenter, MiddleRight, ImageBeforeText via `ModUIHelper` | [x] Selesai | ↑ |
+| 8.12 | Logic — Kembali | Tutup dialog form → kembali ke menu utama | [x] Selesai | ↑ |
+| 8.13 | Logic — Kolom grid | Sembunyikan kolom sensitif `password_hash` dari DataGridView | [x] Selesai | ↑ |
 
-**Checkpoint**: CRUD Master Users lengkap dengan hashing SHA-256 dan proteksi diri berhasil dikompilasi. [x]
+**Checkpoint**: CRUD Master Users lengkap dengan hashing SHA-256, proteksi FK, hard/soft delete, dan icon tombol berhasil dikompilasi. [x]
 
 ---
 
@@ -188,3 +193,6 @@ flowchart TD
 | 14 | `SIPELA/Forms/frmMasterUsers.vb` | 8 | [x] Selesai | Master users CRUD logic, ComboBox role, & search |
 | 15 | `SIPELA/Forms/frmMasterUsers.Designer.vb` | 8 | [x] Selesai | Master users UI designer |
 | 16 | `SIPELA/My Project/Application.Designer.vb` | 5 | [x] Selesai | Startup form diarahkan ke `frmLogin` |
+| 17 | `Database/migration_jenis_lantai.sql` | 2 | [x] Selesai | Skrip migrasi tabel master `jenis_lantai` |
+| 18 | `SIPELA/Modules/ModUIHelper.vb` | 4 | [x] Selesai | Helper style tombol (icon 16×16, alignment) |
+| 19 | `SIPELA/Resources/Icons/` | 4 | [x] Selesai | Icon PNG 16×16 px (insert, update, delete, clear, deactivate) |

@@ -24,6 +24,7 @@ Namespace Forms
             Me.lblJudul = New System.Windows.Forms.Label()
             Me.grpInput = New System.Windows.Forms.GroupBox()
             Me.btnBersihkan = New System.Windows.Forms.Button()
+            Me.btnHapusPermanen = New System.Windows.Forms.Button()
             Me.btnHapus = New System.Windows.Forms.Button()
             Me.btnUbah = New System.Windows.Forms.Button()
             Me.btnSimpan = New System.Windows.Forms.Button()
@@ -84,6 +85,7 @@ Namespace Forms
             'grpInput
             '
             Me.grpInput.Controls.Add(Me.btnBersihkan)
+            Me.grpInput.Controls.Add(Me.btnHapusPermanen)
             Me.grpInput.Controls.Add(Me.btnHapus)
             Me.grpInput.Controls.Add(Me.btnUbah)
             Me.grpInput.Controls.Add(Me.btnSimpan)
@@ -99,7 +101,7 @@ Namespace Forms
             Me.grpInput.Font = New System.Drawing.Font("Segoe UI Semibold", 9.5!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
             Me.grpInput.Location = New System.Drawing.Point(20, 90)
             Me.grpInput.Name = "grpInput"
-            Me.grpInput.Size = New System.Drawing.Size(360, 420)
+            Me.grpInput.Size = New System.Drawing.Size(360, 445)
             Me.grpInput.TabIndex = 1
             Me.grpInput.TabStop = False
             Me.grpInput.Text = " Form Input Lapangan "
@@ -110,20 +112,33 @@ Namespace Forms
             Me.btnBersihkan.Cursor = System.Windows.Forms.Cursors.Hand
             Me.btnBersihkan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
             Me.btnBersihkan.ForeColor = System.Drawing.Color.White
-            Me.btnBersihkan.Location = New System.Drawing.Point(185, 360)
+            Me.btnBersihkan.Location = New System.Drawing.Point(20, 396)
             Me.btnBersihkan.Name = "btnBersihkan"
-            Me.btnBersihkan.Size = New System.Drawing.Size(150, 35)
-            Me.btnBersihkan.TabIndex = 12
-            Me.btnBersihkan.Text = "Bersihkan"
+            Me.btnBersihkan.Size = New System.Drawing.Size(315, 35)
+            Me.btnBersihkan.TabIndex = 13
+            Me.btnBersihkan.Text = "Clear"
             Me.btnBersihkan.UseVisualStyleBackColor = False
+            '
+            'btnHapusPermanen
+            '
+            Me.btnHapusPermanen.BackColor = System.Drawing.Color.Crimson
+            Me.btnHapusPermanen.Cursor = System.Windows.Forms.Cursors.Hand
+            Me.btnHapusPermanen.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnHapusPermanen.ForeColor = System.Drawing.Color.White
+            Me.btnHapusPermanen.Location = New System.Drawing.Point(185, 353)
+            Me.btnHapusPermanen.Name = "btnHapusPermanen"
+            Me.btnHapusPermanen.Size = New System.Drawing.Size(150, 35)
+            Me.btnHapusPermanen.TabIndex = 12
+            Me.btnHapusPermanen.Text = "Delete"
+            Me.btnHapusPermanen.UseVisualStyleBackColor = False
             '
             'btnHapus
             '
-            Me.btnHapus.BackColor = System.Drawing.Color.IndianRed
+            Me.btnHapus.BackColor = System.Drawing.Color.DarkOrange
             Me.btnHapus.Cursor = System.Windows.Forms.Cursors.Hand
             Me.btnHapus.FlatStyle = System.Windows.Forms.FlatStyle.Flat
             Me.btnHapus.ForeColor = System.Drawing.Color.White
-            Me.btnHapus.Location = New System.Drawing.Point(20, 360)
+            Me.btnHapus.Location = New System.Drawing.Point(20, 353)
             Me.btnHapus.Name = "btnHapus"
             Me.btnHapus.Size = New System.Drawing.Size(150, 35)
             Me.btnHapus.TabIndex = 11
@@ -136,11 +151,11 @@ Namespace Forms
             Me.btnUbah.Cursor = System.Windows.Forms.Cursors.Hand
             Me.btnUbah.FlatStyle = System.Windows.Forms.FlatStyle.Flat
             Me.btnUbah.ForeColor = System.Drawing.Color.White
-            Me.btnUbah.Location = New System.Drawing.Point(185, 315)
+            Me.btnUbah.Location = New System.Drawing.Point(185, 310)
             Me.btnUbah.Name = "btnUbah"
             Me.btnUbah.Size = New System.Drawing.Size(150, 35)
             Me.btnUbah.TabIndex = 10
-            Me.btnUbah.Text = "Ubah Data"
+            Me.btnUbah.Text = "Update"
             Me.btnUbah.UseVisualStyleBackColor = False
             '
             'btnSimpan
@@ -149,11 +164,11 @@ Namespace Forms
             Me.btnSimpan.Cursor = System.Windows.Forms.Cursors.Hand
             Me.btnSimpan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
             Me.btnSimpan.ForeColor = System.Drawing.Color.White
-            Me.btnSimpan.Location = New System.Drawing.Point(20, 315)
+            Me.btnSimpan.Location = New System.Drawing.Point(20, 310)
             Me.btnSimpan.Name = "btnSimpan"
             Me.btnSimpan.Size = New System.Drawing.Size(150, 35)
             Me.btnSimpan.TabIndex = 9
-            Me.btnSimpan.Text = "Simpan Baru"
+            Me.btnSimpan.Text = "Insert"
             Me.btnSimpan.UseVisualStyleBackColor = False
             '
             'chkAktif
@@ -253,7 +268,7 @@ Namespace Forms
             Me.grpData.Font = New System.Drawing.Font("Segoe UI Semibold", 9.5!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
             Me.grpData.Location = New System.Drawing.Point(395, 90)
             Me.grpData.Name = "grpData"
-            Me.grpData.Size = New System.Drawing.Size(525, 420)
+            Me.grpData.Size = New System.Drawing.Size(525, 445)
             Me.grpData.TabIndex = 2
             Me.grpData.TabStop = False
             Me.grpData.Text = " Daftar Lapangan "
@@ -289,7 +304,7 @@ Namespace Forms
             Me.dgvLapangan.ReadOnly = True
             Me.dgvLapangan.RowHeadersVisible = False
             Me.dgvLapangan.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.dgvLapangan.Size = New System.Drawing.Size(490, 345)
+            Me.dgvLapangan.Size = New System.Drawing.Size(490, 370)
             Me.dgvLapangan.TabIndex = 0
             '
             'btnKembali
@@ -299,7 +314,7 @@ Namespace Forms
             Me.btnKembali.FlatStyle = System.Windows.Forms.FlatStyle.Flat
             Me.btnKembali.Font = New System.Drawing.Font("Segoe UI Semibold", 9.5!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
             Me.btnKembali.ForeColor = System.Drawing.Color.White
-            Me.btnKembali.Location = New System.Drawing.Point(20, 525)
+            Me.btnKembali.Location = New System.Drawing.Point(20, 550)
             Me.btnKembali.Name = "btnKembali"
             Me.btnKembali.Size = New System.Drawing.Size(180, 35)
             Me.btnKembali.TabIndex = 3
@@ -311,7 +326,7 @@ Namespace Forms
             Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
             Me.BackColor = System.Drawing.Color.White
-            Me.ClientSize = New System.Drawing.Size(940, 575)
+            Me.ClientSize = New System.Drawing.Size(940, 600)
             Me.Controls.Add(Me.btnKembali)
             Me.Controls.Add(Me.grpData)
             Me.Controls.Add(Me.grpInput)
@@ -349,6 +364,7 @@ Namespace Forms
         Friend WithEvents btnSimpan As System.Windows.Forms.Button
         Friend WithEvents btnUbah As System.Windows.Forms.Button
         Friend WithEvents btnHapus As System.Windows.Forms.Button
+        Friend WithEvents btnHapusPermanen As System.Windows.Forms.Button
         Friend WithEvents btnBersihkan As System.Windows.Forms.Button
         Friend WithEvents grpData As System.Windows.Forms.GroupBox
         Friend WithEvents lblCari As System.Windows.Forms.Label

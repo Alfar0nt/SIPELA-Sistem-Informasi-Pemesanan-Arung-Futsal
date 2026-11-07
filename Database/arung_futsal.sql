@@ -32,7 +32,19 @@ CREATE TABLE IF NOT EXISTS `users` (
 ALTER TABLE `users` MODIFY COLUMN `id_user` INT NOT NULL AUTO_INCREMENT;
 
 -- ---------------------------------------------------------------------
--- 2. TABEL: lapangan
+-- 2. TABEL: jenis_lantai (Master Data Pendukung untuk ComboBox Lapangan)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `jenis_lantai` (
+  `id_jenis` INT NOT NULL AUTO_INCREMENT,
+  `nama_jenis` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`id_jenis`),
+  UNIQUE KEY `uq_jenis_nama` (`nama_jenis`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `jenis_lantai` MODIFY COLUMN `id_jenis` INT NOT NULL AUTO_INCREMENT;
+
+-- ---------------------------------------------------------------------
+-- 3. TABEL: lapangan
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `lapangan` (
   `id_lapangan` INT NOT NULL AUTO_INCREMENT,
@@ -49,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `lapangan` (
 ALTER TABLE `lapangan` MODIFY COLUMN `id_lapangan` INT NOT NULL AUTO_INCREMENT;
 
 -- ---------------------------------------------------------------------
--- 3. TABEL: pemesanan
+-- 4. TABEL: pemesanan
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pemesanan` (
   `id_pemesanan` INT NOT NULL AUTO_INCREMENT,
@@ -232,6 +244,13 @@ LEFT JOIN `v_okupansi_bulanan` o ON p.`periode` = o.`periode`;
 -- ---------------------------------------------------------------------
 -- 9. DATA AWAL (SEED DATA)
 -- ---------------------------------------------------------------------
+
+-- Master Jenis Lantai
+INSERT IGNORE INTO `jenis_lantai` (`nama_jenis`) VALUES
+  ('Rumput Sintetis'),
+  ('Vinyl'),
+  ('Interlock'),
+  ('Semen / Plester');
 
 -- Users demo (password hash SHA-256)
 -- owner: owner123 -> 43a0d17178a9d26c9e0fe9a74b0b45e38d32f27aed887a008a54bf6e033bf7b9

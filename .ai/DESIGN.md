@@ -135,13 +135,14 @@
 |-------------|---------|-----------------|------------|
 | ID (read-only) | TextBox | txtIdLapangan | ReadOnly = True |
 | Nama Lapangan | TextBox | txtNamaLapangan | MaxLength = 50 |
-| Jenis Lantai | TextBox | txtJenisLantai | MaxLength = 50 |
+| Jenis Lantai | ComboBox | cmbJenisLantai | DropDownList, Data dari tabel `jenis_lantai` |
 | Harga per Jam | NumericUpDown | numHargaPerJam | Min=0, Max=MaxValue, ThousandsSeparator=True |
 | Status Aktif | CheckBox | chkAktif | Checked = True (default) |
-| Simpan | Button | btnSimpan | BackColor = MediumSeaGreen |
-| Ubah | Button | btnUbah | BackColor = SteelBlue |
-| Nonaktifkan | Button | btnNonaktifkan | BackColor = IndianRed |
-| Bersihkan | Button | btnBersihkan | BackColor = Gray |
+| Insert | Button | btnSimpan | BackColor = MediumSeaGreen, Icon 16×16 |
+| Update | Button | btnUbah | BackColor = SteelBlue, Icon 16×16 |
+| Nonaktifkan | Button | btnHapus | BackColor = DarkOrange, Icon 16×16 (Soft Delete) |
+| Delete | Button | btnHapusPermanen | BackColor = Crimson, Icon 16×16 (Hard Delete) |
+| Clear | Button | btnBersihkan | BackColor = Gray, Icon 16×16 |
 | Daftar Lapangan | DataGridView | dgvLapangan | ReadOnly, FullRowSelect |
 | Pencarian | TextBox | txtCari | — |
 | Kembali | Button | btnKembali | — |
@@ -193,10 +194,11 @@
 | Hint password | Label | lblPasswordHint | ForeColor = Gray, kecil |
 | Nama Lengkap | TextBox | txtNamaLengkap | MaxLength = 100 |
 | Role | ComboBox | cmbRole | DropDownList, Items: Admin, Owner |
-| Simpan | Button | btnSimpan | BackColor = MediumSeaGreen |
-| Ubah | Button | btnUbah | BackColor = SteelBlue |
-| Nonaktifkan | Button | btnNonaktifkan | BackColor = IndianRed |
-| Bersihkan | Button | btnBersihkan | BackColor = Gray |
+| Insert | Button | btnSimpan | BackColor = MediumSeaGreen, Icon 16×16 |
+| Update | Button | btnUbah | BackColor = SteelBlue, Icon 16×16 |
+| Nonaktifkan | Button | btnHapus | BackColor = DarkOrange, Icon 16×16 (Soft Delete) |
+| Delete | Button | btnHapusPermanen | BackColor = Crimson, Icon 16×16 (Hard Delete) |
+| Clear | Button | btnBersihkan | BackColor = Gray, Icon 16×16 |
 | Daftar Users | DataGridView | dgvUsers | ReadOnly, FullRowSelect |
 | Pencarian | TextBox | txtCari | — |
 | Kembali | Button | btnKembali | — |

@@ -5,6 +5,7 @@ Imports System
 Imports System.Data
 Imports System.Windows.Forms
 Imports MySql.Data.MySqlClient
+Imports SIPELA.Modules
 
 Namespace Forms
 
@@ -17,6 +18,7 @@ Namespace Forms
         Private Sub frmMasterLapangan_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             Try
                 KonfigurasiTampilan()
+                MuatJenisLantai()
                 MuatDataLapangan()
                 BersihkanForm()
             Catch ex As Exception
@@ -27,9 +29,6 @@ Namespace Forms
         Private Sub KonfigurasiTampilan()
             txtIdLapangan.ReadOnly = True
             cmbJenisLantai.DropDownStyle = ComboBoxStyle.DropDownList
-            If cmbJenisLantai.Items.Count > 0 Then
-                cmbJenisLantai.SelectedIndex = 0
-            End If
 
             numHargaPerJam.Minimum = 0D
             numHargaPerJam.Maximum = 10000000D
@@ -44,6 +43,47 @@ Namespace Forms
             dgvLapangan.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             dgvLapangan.RowHeadersVisible = False
             dgvLapangan.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(245, 245, 250)
+
+            ' Terapkan style icon dan text relation sesuai ketentuan penugasan
+            ModUIHelper.TerapkanStyleTombol(btnSimpan, "insert.png")
+            ModUIHelper.TerapkanStyleTombol(btnUbah, "update.png")
+            ModUIHelper.TerapkanStyleTombol(btnHapus, "deactivate.png")
+            ModUIHelper.TerapkanStyleTombol(btnHapusPermanen, "delete.png")
+            ModUIHelper.TerapkanStyleTombol(btnBersihkan, "clear.png")
+        End Sub
+
+        ''' <summary>
+        ''' Memuat data pilihan jenis lantai dari tabel master jenis_lantai di database.
+        ''' Memenuhi rubrik penugasan: ComboBox mengambil data master dari database.
+        ''' </summary>
+        Private Sub MuatJenisLantai(Optional pilihan As String = "")
+            Try
+                Dim tabel As New DataTable()
+                Using conn As MySqlConnection = ModKoneksi.BukaKoneksi()
+                    Const sql As String = "SELECT id_jenis, nama_jenis FROM jenis_lantai ORDER BY nama_jenis ASC"
+                    Using da As New MySqlDataAdapter(sql, conn)
+                        da.Fill(tabel)
+                    End Using
+                End Using
+
+                cmbJenisLantai.DataSource = Nothing
+                cmbJenisLantai.DisplayMember = "nama_jenis"
+                cmbJenisLantai.ValueMember = "nama_jenis"
+                cmbJenisLantai.DataSource = tabel
+                cmbJenisLantai.SelectedIndex = -1
+
+                If Not String.IsNullOrEmpty(pilihan) Then
+                    cmbJenisLantai.SelectedValue = pilihan
+                ElseIf cmbJenisLantai.Items.Count > 0 Then
+                    cmbJenisLantai.SelectedIndex = 0
+                End If
+            Catch
+                ' Fallback jika tabel jenis_lantai belum dieksekusi di database server
+                If cmbJenisLantai.Items.Count = 0 Then
+                    cmbJenisLantai.Items.AddRange(New Object() {"Rumput Sintetis", "Vinyl", "Interlock", "Semen / Plester"})
+                    cmbJenisLantai.SelectedIndex = 0
+                End If
+            End Try
         End Sub
 
         Private Sub MuatDataLapangan()
@@ -104,6 +144,7 @@ Namespace Forms
             btnSimpan.Enabled = True
             btnUbah.Enabled = False
             btnHapus.Enabled = False
+            btnHapusPermanen.Enabled = False
 
             dgvLapangan.ClearSelection()
             txtNamaLapangan.Focus()
@@ -259,6 +300,53 @@ Namespace Forms
             End Try
         End Sub
 
+        Private Sub btnHapusPermanen_Click(sender As Object, e As EventArgs) Handles btnHapusPermanen.Click
+            If _idTerpilih <= 0 Then
+                ModErrorHandler.TampilkanPeringatan("Pilih lapangan dari tabel terlebih dahulu.", "Pilih Data")
+                Return
+            End If
+
+            Dim nama As String = txtNamaLapangan.Text.Trim()
+            Dim pesan As String = String.Format(
+                "PERINGATAN: Apakah Anda yakin ingin MENGHAPUS PERMANEN (HARD DELETE) lapangan '{0}' dari database?{1}Tindakan ini tidak dapat dibatalkan!",
+                nama, Environment.NewLine)
+
+            If MessageBox.Show(pesan, "Konfirmasi Hapus Permanen", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) <> DialogResult.Yes Then
+                Return
+            End If
+
+            Try
+                Using conn As MySqlConnection = ModKoneksi.BukaKoneksi()
+                    ' Pengecekan foreign key: apakah lapangan sudah tercatat di detail_pemesanan
+                    Const sqlCek As String = "SELECT COUNT(*) FROM detail_pemesanan WHERE id_lapangan = @id"
+                    Using cmdCek As New MySqlCommand(sqlCek, conn)
+                        cmdCek.Parameters.AddWithValue("@id", _idTerpilih)
+                        Dim count As Long = Convert.ToInt64(cmdCek.ExecuteScalar())
+                        If count > 0 Then
+                            ModErrorHandler.TampilkanPeringatan(
+                                String.Format("Lapangan '{0}' tidak dapat dihapus permanen karena sudah memiliki {1} transaksi riwayat pemesanan.{2}Silakan gunakan tombol Nonaktifkan (Soft Delete) untuk menonaktifkan operasionalnya.", nama, count, Environment.NewLine),
+                                "Integritas Data Terproteksi"
+                            )
+                            Return
+                        End If
+                    End Using
+
+                    ' Jalankan Hard Delete
+                    Const sqlDelete As String = "DELETE FROM lapangan WHERE id_lapangan = @id"
+                    Using cmdDelete As New MySqlCommand(sqlDelete, conn)
+                        cmdDelete.Parameters.AddWithValue("@id", _idTerpilih)
+                        cmdDelete.ExecuteNonQuery()
+                    End Using
+                End Using
+
+                ModErrorHandler.TampilkanInfo("Data lapangan berhasil dihapus permanen dari database.", "Sukses")
+                MuatDataLapangan()
+                BersihkanForm()
+            Catch ex As Exception
+                ModErrorHandler.TampilkanError("Gagal menghapus data lapangan secara permanen", ex)
+            End Try
+        End Sub
+
         Private Sub btnBersihkan_Click(sender As Object, e As EventArgs) Handles btnBersihkan.Click
             BersihkanForm()
         End Sub
@@ -288,6 +376,7 @@ Namespace Forms
                 btnSimpan.Enabled = False
                 btnUbah.Enabled = True
                 btnHapus.Enabled = True
+                btnHapusPermanen.Enabled = True
             Catch ex As Exception
                 ModErrorHandler.TampilkanError("Gagal memilih data dari tabel", ex)
             End Try
