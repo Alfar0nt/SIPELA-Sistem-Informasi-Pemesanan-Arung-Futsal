@@ -91,19 +91,27 @@ Atau buka file `SIPELA\SIPELA.slnx` menggunakan **Visual Studio** dan tekan **F5
 
 ### ⏱️ Timeline Pembagian Tugas Video
 
+| No | Pembicara | Alokasi Waktu | Topik Utama yang Dibahas |
+|:---:|:---|:---:|:---|
+| **1** | **Dhiaurrahman Rabbani (Dhiar)** | `00:00 - 01:40`<br>*(1m 40s)* | Pembukaan, Latar Belakang Kasus Arung Futsal, Struktur Database & ERD, Modul Koneksi Reusable `ModKoneksi.vb`, dan Penanganan Error. |
+| **2** | **Helder Abel Freitas (Helder)** | `01:40 - 03:20`<br>*(1m 40s)* | Demo Login (SHA-256 Hash & Brute-Force Lock), Role-Based Menu Navigasi, Demo CRUD Master Users (Insert, Update, Soft/Hard Delete, Proteksi Akun). |
+| **3** | **Ifaliantsoa Shearia Yiska (Yiska)** | `03:20 - 05:00`<br>*(1m 40s)* | Demo CRUD Master Lapangan, ComboBox Jenis Lantai dinamis dari Database, Validasi Duplikasi, Soft Delete vs Hard Delete dengan FK Check, dan Rangkuman Penutup. |
+
 ```mermaid
-timeline
-    title Timeline Presentasi Video (Total Durasi: 5 Menit)
-    section Dhiar (00:00 - 01:40)
-      00:00 - 00:25 : Pembuka, Perkenalan Kelompok, Latar Belakang Kasus Arung Futsal
-      00:25 - 01:10 : Penjelasan Struktur Database, ERD, Relasi PK-FK, & Constraint
-      01:10 - 01:40 : Penjelasan Modul Reusable ModKoneksi & Penanganan Error
-    section Helder (01:40 - 03:20)
-      01:40 - 02:15 : Demo Autentikasi Login (SHA-256 & Brute-Force Lock) & Menu Utama
-      02:15 - 03:20 : Demo Form Master Users (CRUD, Sensor Hash, Proteksi Akun)
-    section Yiska (03:20 - 05:00)
-      03:20 - 04:35 : Demo Form Master Lapangan (CRUD, ComboBox DB, Validasi, Soft & Hard Delete)
-      04:35 - 05:00 : Rangkuman Deliverables Week 10 & Penutup
+flowchart LR
+    subgraph G1["1. Dhiar (00:00 - 01:40)"]
+        D1["00:00 - 00:25<br/>Pembuka & Latar Belakang"] --> D2["00:25 - 01:10<br/>Arsitektur DB & ERD"] --> D3["01:10 - 01:40<br/>ModKoneksi & Error Handling"]
+    end
+
+    subgraph G2["2. Helder (01:40 - 03:20)"]
+        H1["01:40 - 02:15<br/>Login SHA-256 & Menu"] --> H2["02:15 - 03:20<br/>CRUD Master Users & Proteksi"]
+    end
+
+    subgraph G3["3. Yiska (03:20 - 05:00)"]
+        Y1["03:20 - 04:35<br/>CRUD Lapangan & ComboBox DB"] --> Y2["04:35 - 05:00<br/>Rangkuman Deliverables & Penutup"]
+    end
+
+    G1 --> G2 --> G3
 ```
 
 ---
