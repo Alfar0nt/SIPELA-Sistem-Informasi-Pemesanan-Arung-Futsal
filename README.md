@@ -95,7 +95,7 @@ Atau buka file `SIPELA\SIPELA.slnx` menggunakan **Visual Studio** dan tekan **F5
 |:---:|:---|:---:|:---|
 | **1** | **Dhiaurrahman Rabbani (Dhiar)** | `00:00 - 01:40`<br>*(1m 40s)* | Pembukaan, Latar Belakang Kasus Arung Futsal, Struktur Database & ERD, Modul Koneksi Reusable `ModKoneksi.vb`, dan Penanganan Error. |
 | **2** | **Helder Abel Freitas (Helder)** | `01:40 - 03:20`<br>*(1m 40s)* | Demo Login (SHA-256 Hash & Brute-Force Lock), Role-Based Menu Navigasi, Demo CRUD Master Users (Insert, Update, Soft/Hard Delete, Proteksi Akun). |
-| **3** | **Ifaliantsoa Shearia Yiska (Yiska)** | `03:20 - 05:00`<br>*(1m 40s)* | Demo CRUD Master Lapangan, ComboBox Jenis Lantai dinamis dari Database, Validasi Duplikasi, Soft Delete vs Hard Delete dengan FK Check, dan Rangkuman Penutup. |
+| **3** | **Ifaliantsoa Shearia Yiska (Yiska)** | `03:20 - 05:00`<br>*(1m 40s)* | Master Lapangan Demo (CRUD, Database-driven ComboBox, Validation, Soft & Hard Delete with FK integrity check), and Week 10 Deliverables Summary Closing *(in English)*. |
 
 ```mermaid
 flowchart LR
@@ -169,36 +169,36 @@ flowchart LR
   > *- Tombol **Delete (Hard Delete)** untuk menghapus akun permanen dari database.*  
   > *Sistem juga memiliki proteksi cerdas: kita tidak dapat menghapus akun kita sendiri yang sedang aktif login, dan tidak dapat menghapus user yang memiliki riwayat transaksi pemesanan.*  
   > *4. **Clear & Search**: Tombol Clear membersihkan form kembali ke mode Insert, dan search bar dapat memfilter pengguna secara realtime.*  
-  > *Selanjutnya, Master Lapangan akan didemonstrasikan oleh rekan saya, Yiska."*
+  > *Selanjutnya, demonstrasi Master Lapangan dan kesimpulan akan dilanjutkan oleh rekan saya, Yiska. Now, Yiska will take over to demonstrate the Master Lapangan form."*
 
 ---
 
-#### BAGIAN 3: MASTER DATA LAPANGAN & PENUTUP
-**Pembicara**: **Ifaliantsoa Shearia Yiska F. (Yiska)**  
-**Durasi**: `03:20 - 05:00` (1 menit 40 detik)  
-**Tampilan Layar**: Kamera on-cam Yiska + Aplikasi SIPELA Running (`frmMasterLapangan`) + Tampilan Penutup.
+#### BAGIAN 3: MASTER DATA LAPANGAN & CLOSING (ENGLISH SCRIPT)
+**Speaker**: **Ifaliantsoa Shearia Yiska F. (Yiska)**  
+**Duration**: `03:20 - 05:00` (1 minute 40 seconds)  
+**On-Screen Display**: Yiska on-camera + Running SIPELA application (`frmMasterLapangan`) + Closing screen.
 
-* **(03:20 - 04:35) [Demo Form Master Lapangan & ComboBox Database]**
-  > *(Kembali ke menu -> buka `frmMasterLapangan`)*  
-  > *"Terima kasih Helder. Saya Ifaliantsoa Shearia Yiska. Saya akan mendemonstrasikan Master Form kedua, yaitu **Master Data Lapangan**.*  
-  > *Sesuai rubrik penilaian penugasan Week 10, ComboBox `Jenis Lantai` di form ini tidak di-hardcode, melainkan **mengambil data master langsung dari tabel `jenis_lantai` di database MySQL**.*  
-  > *Mari kita demonstrasikan alur CRUD-nya:*  
-  > *1. **Validasi Input**: Jika kita klik Insert dalam kondisi nama kosong atau harga sewa 0, sistem menampilkan validasi peringatan.*  
-  > *2. **Insert**: Kita masukkan nama `Lapangan D Outdoor`, pilih jenis lantai `Interlock` dari ComboBox database, tentukan tarif sewa Rp 90.000, lalu klik **Insert**. Data berhasil disimpan ke database.*  
-  > *3. **Pencegahan Duplikasi**: Jika kita mencoba menginput nama lapangan yang sama persis, sistem mendeteksi duplikasi data dan menolak penyimpanan.*  
-  > *4. **Update**: Kita pilih lapangan yang baru kita buat, ubah tarif menjadi Rp 95.000, lalu klik **Update**. Data terupdate secara instan.*  
-  > *5. **Soft Delete vs Hard Delete**:*  
-  > *- Jika kita klik **Nonaktifkan**, lapangan berstatus non-aktif sehingga tidak bisa dibooking di jadwal, namun data riwayat tetap aman.*  
-  > *- Jika kita klik **Delete (Hapus Permanen)**, sistem melakukan pengecekan relasi foreign key pada tabel `detail_pemesanan`. Jika lapangan pernah disewa, tombol Delete akan menolak demi integritas data; jika belum pernah ada transaksi, baris fisik berhasil dihapus dari tabel.*  
-  > *6. **Pencarian Realtime**: Kita dapat mengetik kata kunci pada kotak Cari untuk memfilter nama maupun jenis lantai seketika."*
+* **(03:20 - 04:35) [Master Lapangan Form Demo & Database-Driven ComboBox]**
+  > *(Navigate back to menu -> open `frmMasterLapangan`)*  
+  > *"Thank you Helder. Hello everyone, my name is Ifaliantsoa Shearia Yiska. Today, I will demonstrate our second master form, which is **Master Data Lapangan (Futsal Fields)**.*  
+  > *In accordance with the Week 10 assignment rubric, the `Jenis Lantai` (Floor Type) ComboBox in this form is not hardcoded; instead, it **dynamically retrieves master data directly from the `jenis_lantai` table in our MySQL database**.*  
+  > *Let's demonstrate the full CRUD workflow:*  
+  > *1. **Input Validation**: If we attempt to click Insert with an empty name or an invalid price, the system immediately displays informative validation warnings.*  
+  > *2. **Insert**: Let's input the field name as `Lapangan D Outdoor`, select the floor type `Interlock` loaded from the database, set the hourly rate to Rp 90,000, and click the **Insert** button (equipped with our 16x16 icon). The record is stored in MySQL and immediately displayed on our DataGridView.*  
+  > *3. **Duplicate Prevention**: If we attempt to insert another field with the exact same name, our unique constraint detection blocks the operation and warns us.*  
+  > *4. **Read & Update**: Clicking any row in the DataGridView automatically populates all input fields. Let's update the rate to Rp 95,000 and click **Update**. The record updates instantly.*  
+  > *5. **Soft Delete vs. Hard Delete**:*  
+  > *- If we click **Nonaktifkan (Soft Delete)**, the field status is toggled to inactive, preserving historical booking records.*  
+  > *- If we click **Delete (Hard Delete)**, our system verifies foreign key integrity against the `detail_pemesanan` table. If the field already has associated booking transactions, the permanent delete is rejected to protect data integrity; otherwise, if there are no linked records, it is safely removed from the database.*  
+  > *6. **Real-time Search**: We can type in the search bar to filter field names and floor types instantly."*
 
-* **(04:35 - 05:00) [Kesimpulan & Penutup]**
-  > *(Tampilkan kembali ketiga anggota di layar kamera)*  
-  > *"Sebagai rangkuman, proyek SIPELA telah memenuhi seluruh deliverable Week 10:*  
-  > *1. Struktur database MySQL dengan relasi dan constraint yang lengkap.*  
-  > *2. Modul koneksi reusable dengan error handling yang tangguh.*  
-  > *3. Dua form master data fungsional dengan kontrol Windows Forms standar, icon tombol 16×16, ComboBox berbasis query database, serta operasi CRUD lengkap.*  
-  > *Demikian presentasi dan demonstrasi dari kelompok kami. Terima kasih atas perhatian Ibu Dosen dan teman-teman semua. Sampai jumpa!"*
+* **(04:35 - 05:00) [Summary of Deliverables & Closing]**
+  > *(Show all 3 group members on camera)*  
+  > *"To summarize our Week 10 deliverables, our team has successfully implemented:*  
+  > *1. A comprehensive MySQL database with full constraints, primary keys, and foreign keys.*  
+  > *2. A reusable database connection module with robust error handling.*  
+  > *3. Two fully functional master data forms featuring standard Windows Forms controls, 16×16 px icons, database-bound ComboBoxes, and complete CRUD operations.*  
+  > *That concludes our group presentation and demonstration. Thank you very much for your time and attention. Have a great day!"*
 
 ---
 
