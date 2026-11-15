@@ -39,4 +39,56 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Forms\frmLogin.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmLogin.Designer.vb">
+      <DependentUpon>frmLogin.vb</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Forms\frmLogin.resx">
+      <DependentUpon>frmLogin.vb</DependentUpon>
+    </EmbeddedResource>
+
+    <Compile Update="Forms\frmMasterLapangan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmMasterLapangan.Designer.vb">
+      <DependentUpon>frmMasterLapangan.vb</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Forms\frmMasterLapangan.resx">
+      <DependentUpon>frmMasterLapangan.vb</DependentUpon>
+    </EmbeddedResource>
+
+    <Compile Update="Forms\frmMasterUsers.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmMasterUsers.Designer.vb">
+      <DependentUpon>frmMasterUsers.vb</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Forms\frmMasterUsers.resx">
+      <DependentUpon>frmMasterUsers.vb</DependentUpon>
+    </EmbeddedResource>
+
+    <Compile Update="Forms\frmMenuUtama.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmMenuUtama.Designer.vb">
+      <DependentUpon>frmMenuUtama.vb</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Forms\frmMenuUtama.resx">
+      <DependentUpon>frmMenuUtama.vb</DependentUpon>
+    </EmbeddedResource>
+
+    <Compile Update="Forms\frmPemesanan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmPemesanan.Designer.vb">
+      <DependentUpon>frmPemesanan.vb</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Forms\frmPemesanan.resx">
+      <DependentUpon>frmPemesanan.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

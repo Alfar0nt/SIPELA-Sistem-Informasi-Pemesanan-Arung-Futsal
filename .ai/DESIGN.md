@@ -203,6 +203,51 @@
 | Pencarian | TextBox | txtCari | — |
 | Kembali | Button | btnKembali | — |
 
+### 3.4 `frmPemesanan` (Form Transaksi Master-Detail Week 11)
+
+| Property | Value |
+|----------|-------|
+| Size | 984 × 661 |
+| StartPosition | CenterParent |
+| FormBorderStyle | Sizable / CenterParent |
+| MaximizeBox | True |
+
+#### Kontrol Detail Tab 1 — Input Pemesanan Baru (Create: Master-Detail)
+| Nama di Form | Toolbox | Properties Name | Keterangan |
+|-------------|---------|-----------------|------------|
+| Kode Booking | TextBox | `txtKodeBooking` | ReadOnly = True, auto-generated format `BKG-YYYYMMDD-XXXX` |
+| Tanggal Pesan | DateTimePicker | `dtpTanggalPesan` | Enabled = False (Current Date) |
+| Kasir Penanggung Jawab | ComboBox | `cboKasir` | DropDownList, data master dari tabel `users` (`id_user`, `nama_lengkap`), default user aktif |
+| Nama Pemesan | TextBox | `txtNamaPemesan` | MaxLength = 100, Wajib diisi |
+| No. Telepon / WhatsApp | TextBox | `txtNoTelepon` | MaxLength = 15, Wajib diisi |
+| Catatan Tambahan | TextBox | `txtCatatan` | Multiline = True, MaxLength = 255 |
+| Opsi DP Terbayar | CheckBox | `chkDpTerbayar` | Checked = True, langsung catat transaksi DP di `pembayaran` |
+| Metode Bayar DP | ComboBox | `cboMetodeBayar` | DropDownList (Tunai, QRIS, Transfer) |
+| Pilih Lapangan | ComboBox | `cboLapangan` | DropDownList, data master dari tabel `lapangan` (`is_active = TRUE`) |
+| Tanggal Main | DateTimePicker | `dtpTanggalMain` | Format Short, MinDate = Today |
+| Jam Main Operasional | ComboBox | `cboJamMulai` | DropDownList (08:00 - 09:00 s.d. 23:00 - 00:00) |
+| Tarif / Jam | TextBox | `txtTarif` | ReadOnly = True, format Rupiah N0 |
+| Subtotal | TextBox | `txtSubtotal` | ReadOnly = True, format Rupiah N0 |
+| Tambah Slot | Button | `btnAddSlot` | Icon 16x16 px `insert.png`, validasi anti double-booking keranjang & database |
+| Clear Slot | Button | `btnClearSlot` | Icon 16x16 px `clear.png`, reset input slot |
+| Grid Detail Slot (Keranjang) | DataGridView | `dgvDetail` | Menampilkan multi-slot dipesan + kolom button Hapus per baris |
+| Grand Total | Label | `lblGrandTotal` | Akumulasi total sewa semua slot secara realtime |
+| Estimasi DP (30%) | Label | `lblEstimasiDP` | Perhitungan otomatis 30% dari Grand Total |
+| Order Baru | Button | `btnNewOrder` | Icon 16x16 px `clear.png`, reset seluruh form |
+| Simpan Order | Button | `btnSaveOrder` | Icon 16x16 px `insert.png`, simpan atomik via `MySqlTransaction` |
+
+#### Kontrol Detail Tab 2 — Daftar & Riwayat Pemesanan (Read, Update, Delete)
+| Nama di Form | Toolbox | Properties Name | Keterangan |
+|-------------|---------|-----------------|------------|
+| Cari Booking | TextBox | `txtCariBooking` | Filter realtime: kode booking, nama pemesan, no telp, kasir |
+| Filter Status | ComboBox | `cboFilterStatus` | DropDownList: Semua Status, Menunggu DP, DP Terbayar, Lunas, Kedaluwarsa |
+| Cari | Button | `btnCari` | Trigger filter |
+| Grid Riwayat Pemesanan | DataGridView | `dgvRiwayat` | ReadOnly = True, FullRowSelect, formatted currency & date |
+| Segarkan Data | Button | `btnRefresh` | Icon 16x16 px `clear.png` |
+| Lihat Detail Slot | Button | `btnLihatDetail` | Icon 16x16 px `update.png`, rincian dialog slot terpilih |
+| Ubah Status / Pelunasan | Button | `btnUbahStatus` | Icon 16x16 px `update.png`, transisi status & pembayaran pelunasan |
+| Batalkan / Hapus Booking | Button | `btnBatalkanBooking` | Icon 16x16 px `delete.png`, soft cancel & pembebasan slot jadwal |
+
 ---
 
 ## 4. Aturan DataGridView (Semua Form)

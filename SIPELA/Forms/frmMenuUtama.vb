@@ -6,7 +6,8 @@ Imports System.Windows.Forms
 
 Namespace Forms
 
-    Public Class frmMenuUtama
+    Partial Public Class frmMenuUtama
+        Inherits System.Windows.Forms.Form
 
         Private Sub frmMenuUtama_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             ' Pastikan sesi valid
@@ -22,10 +23,12 @@ Namespace Forms
             If ModSesi.IsOwner Then
                 btnMasterLapangan.Enabled = True
                 btnMasterUsers.Enabled = True
+                btnPemesanan.Enabled = True
             Else
                 ' Admin
-                btnMasterLapangan.Enabled = False
+                btnMasterLapangan.Enabled = True
                 btnMasterUsers.Enabled = False
+                btnPemesanan.Enabled = True
             End If
         End Sub
 
@@ -40,10 +43,8 @@ Namespace Forms
         End Sub
 
         Private Sub btnPemesanan_Click(sender As Object, e As EventArgs) Handles btnPemesanan.Click
-            ModErrorHandler.TampilkanInfo(
-                "Fitur Transaksi Pemesanan sedang disiapkan untuk tahap berikutnya (Week 11/Final Project).",
-                "Fitur Mendatang"
-            )
+            Dim formPemesanan As New frmPemesanan()
+            formPemesanan.ShowDialog(Me)
         End Sub
 
         Private Sub btnPembayaran_Click(sender As Object, e As EventArgs) Handles btnPembayaran.Click

@@ -96,7 +96,7 @@ Namespace Forms
             Me.btnMasterLapangan.Name = "btnMasterLapangan"
             Me.btnMasterLapangan.Size = New System.Drawing.Size(195, 120)
             Me.btnMasterLapangan.TabIndex = 0
-            Me.btnMasterLapangan.Text = "Master Data" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Lapangan"
+            Me.btnMasterLapangan.Text = "Master Data" & vbCrLf & "Lapangan"
             Me.btnMasterLapangan.UseVisualStyleBackColor = False
             '
             'btnMasterUsers
@@ -111,7 +111,7 @@ Namespace Forms
             Me.btnMasterUsers.Name = "btnMasterUsers"
             Me.btnMasterUsers.Size = New System.Drawing.Size(195, 120)
             Me.btnMasterUsers.TabIndex = 1
-            Me.btnMasterUsers.Text = "Master Data" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Users (Pengguna)"
+            Me.btnMasterUsers.Text = "Master Data" & vbCrLf & "Users (Pengguna)"
             Me.btnMasterUsers.UseVisualStyleBackColor = False
             '
             'btnPemesanan
@@ -120,13 +120,13 @@ Namespace Forms
             Me.btnPemesanan.Cursor = System.Windows.Forms.Cursors.Hand
             Me.btnPemesanan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
             Me.btnPemesanan.Font = New System.Drawing.Font("Segoe UI Semibold", 11.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
-            Me.btnPemesanan.ForeColor = System.Drawing.Color.Gray
+            Me.btnPemesanan.ForeColor = System.Drawing.Color.DarkSlateBlue
             Me.btnPemesanan.Location = New System.Drawing.Point(450, 20)
             Me.btnPemesanan.Margin = New System.Windows.Forms.Padding(10)
             Me.btnPemesanan.Name = "btnPemesanan"
             Me.btnPemesanan.Size = New System.Drawing.Size(195, 120)
             Me.btnPemesanan.TabIndex = 2
-            Me.btnPemesanan.Text = "Transaksi" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Pemesanan"
+            Me.btnPemesanan.Text = "Transaksi" & vbCrLf & "Pemesanan"
             Me.btnPemesanan.UseVisualStyleBackColor = False
             '
             'btnPembayaran
@@ -141,7 +141,7 @@ Namespace Forms
             Me.btnPembayaran.Name = "btnPembayaran"
             Me.btnPembayaran.Size = New System.Drawing.Size(195, 120)
             Me.btnPembayaran.TabIndex = 3
-            Me.btnPembayaran.Text = "Transaksi" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Pembayaran"
+            Me.btnPembayaran.Text = "Transaksi" & vbCrLf & "Pembayaran"
             Me.btnPembayaran.UseVisualStyleBackColor = False
             '
             'btnJadwal
@@ -156,7 +156,7 @@ Namespace Forms
             Me.btnJadwal.Name = "btnJadwal"
             Me.btnJadwal.Size = New System.Drawing.Size(195, 120)
             Me.btnJadwal.TabIndex = 4
-            Me.btnJadwal.Text = "Kalender" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Jadwal Lapangan"
+            Me.btnJadwal.Text = "Kalender" & vbCrLf & "Jadwal Lapangan"
             Me.btnJadwal.UseVisualStyleBackColor = False
             '
             'btnLaporan
@@ -171,7 +171,7 @@ Namespace Forms
             Me.btnLaporan.Name = "btnLaporan"
             Me.btnLaporan.Size = New System.Drawing.Size(195, 120)
             Me.btnLaporan.TabIndex = 5
-            Me.btnLaporan.Text = "Laporan" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Pendapatan && Okupansi"
+            Me.btnLaporan.Text = "Laporan" & vbCrLf & "Pendapatan && Okupansi"
             Me.btnLaporan.UseVisualStyleBackColor = False
             '
             'pnlFooter

@@ -1,6 +1,6 @@
 # SIPELA — Sistem Informasi Pemesanan Lapangan Arung Futsal
 
-> **Tugas Kelompok (Group Assignment) — Week 10: Database & Master Form**  
+> **Tugas Kelompok (Group Assignment) — Week 11: Transactional Form (Master-Detail)**  
 > **Mata Kuliah**: Pemrograman Desktop (Semester 3)  
 > **Dosen Pengampu**: Tri Luhur Indayanti Sugata, S.ST, M.IM.  
 > **Program Studi**: Sistem Informasi / Informatika, UPN "Veteran" Jawa Timur  
@@ -14,18 +14,22 @@
 
 ---
 
-## 📌 Ringkasan Proyek
+## 📌 Ringkasan Proyek & Pemenuhan Tugas Week 11
 
 **SIPELA** (Sistem Informasi Pemesanan Lapangan Arung Futsal) adalah aplikasi desktop berbasis **VB.NET Windows Forms (.NET 10)** dan **MySQL** yang dirancang untuk mendigitalkan operasional penyewaan lapangan futsal pada usaha Arung Futsal (jam operasional 08.00–00.00).
 
-Pada penugasan **Week 10 (Group Assignment)**, kelompok kami telah mengimplementasikan seluruh kebutuhan rubrik penilaian:
-1. **Database Design & Implementation**: Skrip MySQL lengkap (`arung_futsal.sql`) dengan struktur tabel, relasi PK & FK, constraint data, stored procedure, view agregasi, dan sample seed data.
-2. **Database Migration Pendukung**: Skrip `migration_jenis_lantai.sql` untuk tabel master pendukung jenis lantai futsal.
-3. **Reusable Database Connection**: Modul koneksi terpusat (`ModKoneksi.vb`) dengan validasi koneksi dan error handling terstruktur (`MySqlException`).
-4. **Master Data Form 1 — Lapangan (`frmMasterLapangan`)**: CRUD lengkap (Insert, Update, Nonaktifkan/Soft Delete, Delete/Hard Delete dengan proteksi integritas FK, Clear), DataGridView terformat, pencarian realtime, dan ComboBox jenis lantai yang **terhubung langsung ke database MySQL**.
-5. **Master Data Form 2 — Users (`frmMasterUsers`)**: CRUD lengkap akun pengguna, enkripsi password hash **SHA-256**, ComboBox pilihan role (Owner/Admin), sensor kolom password di DataGridView, proteksi hapus akun yang sedang login, dan proteksi hapus akun dengan riwayat transaksi.
-6. **Form Autentikasi & Navigasi**: `frmLogin` (autentikasi SHA-256 + proteksi brute-force lock) dan `frmMenuUtama` (menu role-based access).
-7. **Standar Properti Tombol & Icon**: Seluruh tombol CRUD pada form master dilengkapi icon PNG 16×16 px lokal dengan perataan `ImageAlign = MiddleCenter`, `TextAlign = MiddleRight`, dan `TextImageRelation = ImageBeforeText`.
+Pada penugasan **Week 11 (Group Assignment)**, kelompok kami telah mengimplementasikan **Form Transaksi (Master-Detail)** yang lengkap, tangguh, dan memenuhi seluruh kriteria rubrik penugasan:
+
+| Kriteria Rubrik Penugasan Week 11 | Implementasi pada SIPELA | Keterangan & Lokasi Berkas |
+|:---|:---|:---|
+| **1. Form Transaksi Master-Detail** | Form `frmPemesanan` dengan 2 tab: Tab 1 untuk Input Transaksi Master-Detail (Keranjang multi-slot) dan Tab 2 untuk Riwayat & Manajemen Transaksi. | `SIPELA/Forms/frmPemesanan.vb` & `frmPemesanan.Designer.vb` |
+| **2. Terhubung ke Database MySQL** | Menggunakan relasi tabel Header `pemesanan`, Detail `detail_pemesanan`, dan tabel transaksi `pembayaran` pada database MySQL `arung_futsal`. | `Database/arung_futsal.sql` & `SIPELA/Modules/ModKoneksi.vb` |
+| **3. Operasi CRUD Transaksional Lengkap** | **Create**: Simpan booking multi-slot atomik.<br>**Read**: Tabel riwayat pemesanan terformat + popup rincian slot.<br>**Update**: Ubah status booking & pelunasan pembayaran.<br>**Delete**: Batalkan/hapus booking dengan pelepasan slot jadwal. | `SIPELA/Forms/frmPemesanan.vb` |
+| **4. Penomoran Otomatis (Auto-Numbering)** | Format unik harian `BKG-YYYYMMDD-XXXX` untuk booking dan `PAY-YYYYMMDD-XXXX` untuk transaksi pembayaran melalui modul atomik `ModAutoNumber.vb`. | `SIPELA/Modules/ModAutoNumber.vb` |
+| **5. Validasi Input & Anti Double-Booking** | Validasi input kosong (nama, no telepon, kasir), validasi keranjang belanja, serta validasi anti-bentrok jadwal (anti double-booking) di keranjang dan di database MySQL. | Metode `ApakahSlotSudahDipesan()` di `frmPemesanan.vb` |
+| **6. Perhitungan Otomatis & Down Payment (DP)** | Perhitungan otomatis tarif slot, Grand Total sewa secara realtime, dan estimasi syarat pembayaran minimal Uang Muka / DP sebesar **30%**. Opsi *"Langsung Catat DP Terbayar"* terintegrasi otomatis. | Metode `HitungGrandTotal()` di `frmPemesanan.vb` |
+| **7. ComboBox Terhubung Database Master** | ComboBox Lapangan (`cboLapangan`) mengambil data aktif dari tabel `lapangan`. ComboBox Kasir (`cboKasir`) mengambil data dari tabel `users` dan default ke sesi kasir aktif. | `MuatMasterLapangan()` & `MuatKasir()` di `frmPemesanan.vb` |
+| **8. Standar Properti Tombol & Icon** | Tombol CRUD dilengkapi icon 16×16 px lokal dengan perataan `ImageAlign = MiddleCenter`, `TextAlign = MiddleRight`, dan `TextImageRelation = ImageBeforeText`. | `SIPELA/Modules/ModUIHelper.vb` |
 
 ---
 
@@ -53,7 +57,6 @@ mysql -u root -p < "Database/arung_futsal.sql"
 # Atau jalankan script migration jenis lantai jika database arung_futsal sudah pernah dibuat sebelumnya:
 mysql -u root -p < "Database/migration_jenis_lantai.sql"
 ```
-*(Anda juga dapat membuka dan mengeksekusi file `Database/arung_futsal.sql` langsung melalui aplikasi GUI seperti HeidiSQL, DBeaver, Navicat, atau phpMyAdmin).*
 
 ### 2. Konfigurasi Koneksi (Jika Diperlukan)
 Secara default, konfigurasi koneksi berada di file `SIPELA/Modules/ModKoneksi.vb`:
@@ -74,41 +77,43 @@ Atau buka file `SIPELA\SIPELA.slnx` menggunakan **Visual Studio** dan tekan **F5
 ### 🔑 Akun Demo Pengujian
 | Role | Username | Password | Hak Akses |
 |:---|:---|:---|:---|
-| **Owner** | `owner` | `owner123` | Akses Penuh: Master Lapangan, Master Users, dan Logout |
-| **Admin** | `admin` | `admin123` | Akses Operasional: Master Lapangan dan Logout (Master Users dinonaktifkan) |
+| **Owner** | `owner` | `owner123` | Akses Penuh: Master Lapangan, Master Users, Transaksi Pemesanan, dan Logout |
+| **Admin** | `admin` | `admin123` | Akses Operasional: Transaksi Pemesanan, Master Lapangan, dan Logout (Master Users dinonaktifkan) |
 
 ---
 
-## 📹 PANDUAN & SKRIP VIDEO DEMONSTRASI (MAKSIMAL 5 MENIT)
+## 📹 PANDUAN & SKRIP VIDEO DEMONSTRASI (FOKUS TRANSAKSI WEEK 11)
 
 > [!IMPORTANT]
-> Sesuai instruksi penugasan Week 10:
-> - **Durasi maksimal**: 5 menit.
-> - **Ketentuan kamera**: Seluruh anggota kelompok (**Dhiar, Helder, Yiska**) **wajib on-cam** (wajah tampak di kamera) dan berpartisipasi menjelaskan/mendemonstrasikan kontribusi masing-masing.
+> Sesuai instruksi penugasan kelompok Week 11:
+> - **Fokus demonstrasi**: Eksklusif pada fitur baru form transaksi Master-Detail (`frmPemesanan`).
+> - **Durasi target**: Singkat & padat (~3 hingga 4 menit, maksimal 5 menit).
+> - **Ketentuan kamera**: Seluruh anggota kelompok (**Dhiar, Helder, Yiska**) **wajib on-cam** (wajah tampak di kamera) dan berpartisipasi mendemonstrasikan bagian masing-masing.
+> - **Penyampaian Yiska**: Disampaikan dalam **Bahasa Inggris** (*English*) karena merupakan mahasiswa internasional.
 > - **Platform submission**: Upload link rekaman video (Google Drive / YouTube Unlisted) ke portal **ILMU2**.
 
 ---
 
 ### ⏱️ Timeline Pembagian Tugas Video
 
-| No | Pembicara | Alokasi Waktu | Topik Utama yang Dibahas |
+| No | Pembicara | Alokasi Waktu | Topik Utama (Fokus Fitur Transaksi Baru) |
 |:---:|:---|:---:|:---|
-| **1** | **Dhiaurrahman Rabbani (Dhiar)** | `00:00 - 01:40`<br>*(1m 40s)* | Pembukaan, Latar Belakang Kasus Arung Futsal, Struktur Database & ERD, Modul Koneksi Reusable `ModKoneksi.vb`, dan Penanganan Error. |
-| **2** | **Helder Abel Freitas (Helder)** | `01:40 - 03:20`<br>*(1m 40s)* | Demo Login (SHA-256 Hash & Brute-Force Lock), Role-Based Menu Navigasi, Demo CRUD Master Users (Insert, Update, Soft/Hard Delete, Proteksi Akun). |
-| **3** | **Ifaliantsoa Shearia Yiska (Yiska)** | `03:20 - 05:00`<br>*(1m 40s)* | Master Lapangan Demo (CRUD, Database-driven ComboBox, Validation, Soft & Hard Delete with FK integrity check), and Week 10 Deliverables Summary Closing *(in English)*. |
+| **1** | **Dhiaurrahman Rabbani (Dhiar)** | `00:00 - 01:15`<br>*(1m 15s)* | Pembukaan, Latar Belakang Transaksi Futsal, Skema Database Header-Detail (`pemesanan` & `detail_pemesanan`), dan Penomoran Otomatis Atomik (`BKG-YYYYMMDD-XXXX`). |
+| **2** | **Helder Abel Freitas (Helder)** | `01:15 - 02:30`<br>*(1m 15s)* | Demo Tab 1 (Create Master-Detail): ComboBox DB (Kasir & Lapangan), Input Multi-Slot, Validasi Anti Double-Booking, Perhitungan Otomatis (Total & DP 30%), dan Simpan Order Atomik (`MySqlTransaction`). |
+| **3** | **Ifaliantsoa Shearia Yiska (Yiska)** | `02:30 - 03:45`<br>*(1m 15s)* | Demo Tab 2 (Read, Update, Delete) *(in English)*: Live Search & Filter, View Detailed Slots, Update Status / Pelunasan, Cancel Booking (Freeing Reserved Slots), and Closing. |
 
 ```mermaid
 flowchart LR
-    subgraph G1["1. Dhiar (00:00 - 01:40)"]
-        D1["00:00 - 00:25<br/>Pembuka & Latar Belakang"] --> D2["00:25 - 01:10<br/>Arsitektur DB & ERD"] --> D3["01:10 - 01:40<br/>ModKoneksi & Error Handling"]
+    subgraph G1["1. Dhiar (00:00 - 01:15)"]
+        D1["Pembuka & Konteks Transaksi"] --> D2["Skema DB & Auto-Numbering"]
     end
 
-    subgraph G2["2. Helder (01:40 - 03:20)"]
-        H1["01:40 - 02:15<br/>Login SHA-256 & Menu"] --> H2["02:15 - 03:20<br/>CRUD Master Users & Proteksi"]
+    subgraph G2["2. Helder (01:15 - 02:30)"]
+        H1["Input Master-Detail & Multi-Slot"] --> H2["Anti Double-Booking & Simpan Order"]
     end
 
-    subgraph G3["3. Yiska (03:20 - 05:00)"]
-        Y1["03:20 - 04:35<br/>CRUD Lapangan & ComboBox DB"] --> Y2["04:35 - 05:00<br/>Rangkuman Deliverables & Penutup"]
+    subgraph G3["3. Yiska (02:30 - 03:45)"]
+        Y1["Read, Update Status & Cancel"] --> Y2["Summary & Closing"]
     end
 
     G1 --> G2 --> G3
@@ -116,89 +121,71 @@ flowchart LR
 
 ---
 
-### 🎬 Skrip Detail Percakapan Menit-per-Menit
+### 🎬 Skrip Percakapan Video (Ringkas & Padat)
 
-#### BAGIAN 1: PEMBUKAAN, DATABASE, & MODUL KONEKSI
+#### BAGIAN 1: PEMBUKAAN, SKEMA TRANSAKSI, & PENOMORAN OTOMATIS
 **Pembicara**: **Dhiaurrahman Rabbani Harianto (Dhiar)**  
-**Durasi**: `00:00 - 01:40` (1 menit 40 detik)  
-**Tampilan Layar**: Kamera on-cam Dhiar + Presentasi ERD & Skrip SQL (`arung_futsal.sql`) + Code Editor `ModKoneksi.vb`.
+**Durasi**: `00:00 - 01:15` (1 menit 15 detik)  
+**Tampilan Layar**: On-cam Dhiar + ERD Transaksi / Database Tool (`arung_futsal.sql`) + Code Editor `ModAutoNumber.vb`.
 
-* **(00:00 - 00:25) [Pembukaan & Studi Kasus]**
-  > *"Halo semuanya! Selamat pagi/siang kepada Bu Tri Luhur dan rekan-rekan sekalian. Kami dari Kelompok Internasional mata kuliah Pemrograman Desktop akan mendemonstrasikan hasil pengerjaan Group Assignment Week 10: Database & Master Form.*  
-  > *Anggota kelompok kami terdiri dari saya sendiri Dhiaurrahman Rabbani, rekan saya Helder Abel Freitas, dan Ifaliantsoa Shearia Yiska.*  
-  > *Studi kasus yang kami angkat adalah **SIPELA — Sistem Informasi Pemesanan Lapangan Arung Futsal**, sebuah solusi desktop untuk mengelola jadwal sewa, reservasi, dan transaksi lapangan futsal secara terpusat."*
+* **(00:00 - 00:25) [Pembukaan & Latar Belakang]**
+  > *"Halo Bu Tri Luhur dan rekan-rekan sekalian. Kami dari Kelompok Internasional mata kuliah Pemrograman Desktop: saya Dhiaurrahman Rabbani, rekan saya Helder Abel Freitas, dan Ifaliantsoa Shearia Yiska.*  
+  > *Pada video ini, kami mendemonstrasikan implementasi fitur baru penugasan Week 11, yaitu **Form Transaksi Master-Detail Pemesanan Lapangan Futsal (SIPELA)**."*
 
-* **(00:25 - 01:10) [Database Implementation & ERD]**
-  > *(Tampilkan database di HeidiSQL/DBeaver atau diagram ERD)*  
-  > *"Pada bagian database, kami telah merancang database MySQL `arung_futsal` yang terdiri dari 7 tabel utama:*  
-  > *1. Tabel `users` untuk manajemen akun dan hak akses.*  
-  > *2. Tabel `jenis_lantai` sebagai tabel master pendukung jenis lapangan.*  
-  > *3. Tabel `lapangan` dengan constraint harga positif dan soft-delete.*  
-  > *4. Tabel `pemesanan` dan `detail_pemesanan` yang memiliki composite unique key untuk mencegah double-booking.*  
-  > *5. Serta tabel `pembayaran` dan `penomoran`.*  
-  > *Seluruh relasi telah menerapkan Primary Key dan Foreign Key dengan aturan `ON DELETE RESTRICT` untuk menjaga integritas data transaksi."*
-
-* **(01:10 - 01:40) [Modul Koneksi Reusable & Error Handling]**
-  > *(Tampilkan kode `ModKoneksi.vb` di Visual Studio)*  
-  > *"Untuk menghubungkan aplikasi VB.NET ke MySQL, kami membuat modul reusable `ModKoneksi.vb` menggunakan package `MySql.Data`. Modul ini mengkapsulasi fungsi `BukaKoneksi()` dan `TestKoneksi()`. Jika koneksi database terputus atau server MySQL belum aktif, sistem secara otomatis menangkap exception `MySqlException` dan menampilkan pesan error yang informatif kepada pengguna melalui `ModErrorHandler` tanpa menyebabkan aplikasi crash.*  
-  > *Selanjutnya, demonstrasi form login dan Master Users akan dilanjutkan oleh rekan saya, Helder."*
+* **(00:25 - 01:15) [Skema Database Transaksi & Penomoran Atomik]**
+  > *(Tampilkan relasi tabel di database)*  
+  > *"Untuk menangani transaksi sewa multi-slot, kami merancang 3 tabel terelasi di MySQL:*  
+  > *1. `pemesanan` sebagai Header: mencatat kode booking unik, ID kasir, nama pemesan, nomor telepon, total sewa, batas bayar, dan status pemesanan.*  
+  > *2. `detail_pemesanan` sebagai Detail: mencatat setiap slot jam lapangan yang dipesan dengan proteksi `UNIQUE KEY uq_slot_aktif` agar tidak terjadi double-booking di level database.*  
+  > *3. `pembayaran`: mencatat transaksi uang muka (DP) maupun pelunasan.*  
+  > *Kode booking berformat unik `BKG-YYYYMMDD-XXXX` di-generate secara atomik melalui `ModAutoNumber.vb`, dan seluruh proses simpan dilindungi oleh `MySqlTransaction`. Selanjutnya, demo input pemesanan akan dipandu oleh Helder."*
 
 ---
 
-#### BAGIAN 2: LOGIN AUTHENTICATION & MASTER DATA USERS
+#### BAGIAN 2: INPUT TRANSAKSI MASTER-DETAIL, PERHITUNGAN, & ANTI DOUBLE-BOOKING
 **Pembicara**: **Helder Abel Freitas (Helder)**  
-**Durasi**: `01:40 - 03:20` (1 menit 40 detik)  
-**Tampilan Layar**: Kamera on-cam Helder + Aplikasi SIPELA Running (`frmLogin`, `frmMenuUtama`, `frmMasterUsers`).
+**Durasi**: `01:15 - 02:30` (1 menit 15 detik)  
+**Tampilan Layar**: On-cam Helder + Aplikasi SIPELA (`frmMenuUtama` -> `frmPemesanan` Tab 1).
 
-* **(01:40 - 02:15) [Demo Login & Hak Akses Menu]**
-  > *(Jalankan aplikasi, tampilkan `frmLogin`)*  
-  > *"Terima kasih Dhiar. Saya Helder Abel Freitas. Sekarang kita akan melihat implementasi autentikasi pengguna pada form login.*  
-  > *Di SIPELA, seluruh password disimpan menggunakan enkripsi hashing **SHA-256** dan tidak pernah disimpan dalam bentuk plaintext. Selain itu, kami menerapkan proteksi brute-force: jika pengguna salah memasukkan password sebanyak 5 kali berturut-turut, akun akan terkunci otomatis selama 15 menit.*  
-  > *Mari kita coba login sebagai akun `owner` dengan password `owner123`.*  
-  > *(Klik Login -> Masuk ke Menu Utama).*  
-  > *Saat login sebagai Owner, seluruh fitur master terbuka penuh. Namun jika login sebagai Admin, tombol Master Users akan dinonaktifkan sesuai prinsip Role-Based Access Control."*
+* **(01:15 - 01:50) [Input Header, ComboBox DB, & Multi-Slot Grid]**
+  > *(Buka Menu Utama -> Klik tombol Transaksi Pemesanan)*  
+  > *"Terima kasih Dhiar. Saya Helder Abel Freitas. Pada Tab 1 ini, kita menginput pemesanan baru:*  
+  > *1. Kode booking terisi otomatis.*  
+  > *2. ComboBox Kasir dan Lapangan mengambil data master aktif langsung dari database MySQL.*  
+  > *3. Kita isi Nama Pemesan `Budi Santoso` dan No. Telepon `081234567890`.*  
+  > *4. Pilih Lapangan A Sintetis, Tanggal Main, dan jam operasional `08:00 - 09:00`. Klik **+ Tambah Slot**. Tarif Rp 100.000 masuk ke keranjang.*  
+  > *5. Kita tambahkan slot kedua `09:00 - 10:00`. Di bagian bawah, **Grand Total (Rp 200.000)** dan syarat minimal **DP 30% (Rp 60.000)** terhitung otomatis secara realtime."*
 
-* **(02:15 - 03:20) [Demo CRUD Master Users]**
-  > *(Buka menu Master Users -> `frmMasterUsers`)*  
-  > *"Sekarang kita masuk ke Form Master Users. Di sini seluruh data pengguna ditampilkan di DataGridView, di mana kolom sensitif seperti hash password disembunyikan demi keamanan.*  
-  > *Mari kita uji operasi CRUD-nya:*  
-  > *1. **Insert (Tambah Data)**: Kita masukkan username `kasir1`, password `kasir123`, nama lengkap `Kasir Pagi`, dan pilih Role `Admin` dari ComboBox. Klik tombol **Insert** (dengan icon 16x16 px). Data berhasil masuk ke MySQL dan grid langsung ter-refresh.*  
-  > *2. **Read & Update (Ubah Data)**: Saat baris `kasir1` kita klik di DataGridView, form input terisi otomatis. Kita ubah nama lengkapnya menjadi `Kasir Senior`, password kita kosongkan agar tetap memakai password lama, lalu klik **Update**. Data berhasil diperbarui.*  
-  > *3. **Delete & Proteksi Keamanan**: Kami menyediakan dua jenis penghapusan:*  
-  > *- Tombol **Nonaktifkan (Soft Delete)** untuk menonaktifkan status akun tanpa menghapus histori.*  
-  > *- Tombol **Delete (Hard Delete)** untuk menghapus akun permanen dari database.*  
-  > *Sistem juga memiliki proteksi cerdas: kita tidak dapat menghapus akun kita sendiri yang sedang aktif login, dan tidak dapat menghapus user yang memiliki riwayat transaksi pemesanan.*  
-  > *4. **Clear & Search**: Tombol Clear membersihkan form kembali ke mode Insert, dan search bar dapat memfilter pengguna secara realtime.*  
-  > *Selanjutnya, demonstrasi Master Lapangan dan kesimpulan akan dilanjutkan oleh rekan saya, Yiska. Now, Yiska will take over to demonstrate the Master Lapangan form."*
+* **(01:50 - 02:30) [Uji Anti Double-Booking & Simpan Order Atomik]**
+  > *(Coba klik Tambah Slot yang sama, lalu klik Simpan Order)*  
+  > *"Jika kita coba menambahkan slot `08:00 - 09:00` sekali lagi, sistem langsung menolak dengan validasi **Anti Double-Booking**.*  
+  > *Sekarang kita centang opsi **'Langsung Catat DP Terbayar'** dengan metode `QRIS`, lalu klik tombol **Simpan Order**.*  
+  > *Melalui `MySqlTransaction`, data header, detail slot, dan nomor bukti pembayaran `PAY-YYYYMMDD-XXXX` berhasil tersimpan secara atomik!*  
+  > *Selanjutnya, riwayat pemesanan dan update status akan didemonstrasikan oleh Yiska in English."*
 
 ---
 
-#### BAGIAN 3: MASTER DATA LAPANGAN & CLOSING (ENGLISH SCRIPT)
+#### BAGIAN 3: RIWAYAT PEMESANAN, UPDATE STATUS, PEMBATALAN, & CLOSING (ENGLISH SCRIPT)
 **Speaker**: **Ifaliantsoa Shearia Yiska F. (Yiska)**  
-**Duration**: `03:20 - 05:00` (1 minute 40 seconds)  
-**On-Screen Display**: Yiska on-camera + Running SIPELA application (`frmMasterLapangan`) + Closing screen.
+**Duration**: `02:30 - 03:45` (1 minute 15 seconds)  
+**On-Screen Display**: On-cam Yiska + Running SIPELA application (`frmPemesanan` Tab 2: Riwayat Pemesanan).
 
-* **(03:20 - 04:35) [Master Lapangan Form Demo & Database-Driven ComboBox]**
-  > *(Navigate back to menu -> open `frmMasterLapangan`)*  
-  > *"Thank you Helder. Hello everyone, my name is Ifaliantsoa Shearia Yiska. Today, I will demonstrate our second master form, which is **Master Data Lapangan (Futsal Fields)**.*  
-  > *In accordance with the Week 10 assignment rubric, the `Jenis Lantai` (Floor Type) ComboBox in this form is not hardcoded; instead, it **dynamically retrieves master data directly from the `jenis_lantai` table in our MySQL database**.*  
-  > *Let's demonstrate the full CRUD workflow:*  
-  > *1. **Input Validation**: If we attempt to click Insert with an empty name or an invalid price, the system immediately displays informative validation warnings.*  
-  > *2. **Insert**: Let's input the field name as `Lapangan D Outdoor`, select the floor type `Interlock` loaded from the database, set the hourly rate to Rp 90,000, and click the **Insert** button (equipped with our 16x16 icon). The record is stored in MySQL and immediately displayed on our DataGridView.*  
-  > *3. **Duplicate Prevention**: If we attempt to insert another field with the exact same name, our unique constraint detection blocks the operation and warns us.*  
-  > *4. **Read & Update**: Clicking any row in the DataGridView automatically populates all input fields. Let's update the rate to Rp 95,000 and click **Update**. The record updates instantly.*  
-  > *5. **Soft Delete vs. Hard Delete**:*  
-  > *- If we click **Nonaktifkan (Soft Delete)**, the field status is toggled to inactive, preserving historical booking records.*  
-  > *- If we click **Delete (Hard Delete)**, our system verifies foreign key integrity against the `detail_pemesanan` table. If the field already has associated booking transactions, the permanent delete is rejected to protect data integrity; otherwise, if there are no linked records, it is safely removed from the database.*  
-  > *6. **Real-time Search**: We can type in the search bar to filter field names and floor types instantly."*
+* **(02:30 - 03:15) [Transaction History, Detailed Breakdown, Update Status & Cancellation]**
+  > *(Switch to Tab 2: "Daftar & Riwayat Pemesanan")*  
+  > *"Thank you Helder. Hello everyone, my name is Ifaliantsoa Shearia Yiska. In Tab 2, we manage the complete lifecycle of court bookings:*  
+  > *1. **Read & Search**: All orders are displayed with formatted currency and timestamps. We can quickly search by booking code, customer name, or filter by status.*  
+  > *2. **Read Slot Details**: Selecting Budi's booking and clicking **Lihat Detail Slot** shows the exact courts, dates, operational hours, and active statuses.*  
+  > *3. **Update Status / Settlement**: Clicking **Ubah Status** allows the cashier to confirm the remaining balance. Once confirmed, the status updates to **Lunas** (Paid in Full) and a settlement record is automatically saved into the `pembayaran` table.*  
+  > *4. **Cancel / Delete (Slot Release)**: Clicking **Batalkan Booking** changes the status to 'Kedaluwarsa' and frees the reserved time slots, making them immediately available for new customers without database conflicts."*
 
-* **(04:35 - 05:00) [Summary of Deliverables & Closing]**
+* **(03:15 - 03:45) [Summary of Deliverables & Closing]**
   > *(Show all 3 group members on camera)*  
-  > *"To summarize our Week 10 deliverables, our team has successfully implemented:*  
-  > *1. A comprehensive MySQL database with full constraints, primary keys, and foreign keys.*  
-  > *2. A reusable database connection module with robust error handling.*  
-  > *3. Two fully functional master data forms featuring standard Windows Forms controls, 16×16 px icons, database-bound ComboBoxes, and complete CRUD operations.*  
-  > *That concludes our group presentation and demonstration. Thank you very much for your time and attention. Have a great day!"*
+  > *"To summarize our Week 11 deliverables, our team has successfully implemented:*  
+  > *1. A complete Master-Detail transactional form connected to MySQL with full CRUD capabilities.*  
+  > *2. Live multi-slot scheduling with robust anti double-booking protection.*  
+  > *3. Real-time automatic calculations for total fees and 30% down payment.*  
+  > *4. Reliable database transactions ensuring commit and rollback integrity.*  
+  > *That concludes our demonstration. Thank you very much for your time and attention!"*
 
 ---
 
@@ -209,7 +196,7 @@ SIPELA-Sistem-Informasi-Pemesanan-Arung-Futsal/
 ├── .ai/                                  # Dokumentasi Desain & Rencana (AI Workspace)
 │   ├── APP-FLOW.md                       # Diagram alur aplikasi
 │   ├── DESIGN.md                         # Spesifikasi detail UI & properti kontrol
-│   ├── IMPLEMENTATION-PLAN.md            # Rencana implementasi 8 fase
+│   ├── IMPLEMENTATION-PLAN.md            # Rencana implementasi 9 fase (Week 10 & 11)
 │   ├── PRD.md                            # Product Requirements Document
 │   └── TRD.md                            # Technical Requirements Document
 ├── Database/
@@ -222,14 +209,21 @@ SIPELA-Sistem-Informasi-Pemesanan-Arung-Futsal/
 │   ├── Forms/                            # Form Antarmuka Pengguna
 │   │   ├── frmLogin.vb                   # Form Autentikasi Pengguna
 │   │   ├── frmLogin.Designer.vb
+│   │   ├── frmLogin.resx
 │   │   ├── frmMenuUtama.vb               # Form Menu Utama (Role-Based Access)
 │   │   ├── frmMenuUtama.Designer.vb
+│   │   ├── frmMenuUtama.resx
 │   │   ├── frmMasterLapangan.vb          # Form Master Lapangan (CRUD & ComboBox DB)
 │   │   ├── frmMasterLapangan.Designer.vb
+│   │   ├── frmMasterLapangan.resx
 │   │   ├── frmMasterUsers.vb             # Form Master Pengguna (CRUD & SHA-256)
-│   │   └── frmMasterUsers.Designer.vb
+│   │   ├── frmMasterUsers.Designer.vb
+│   │   ├── frmMasterUsers.resx
+│   │   ├── frmPemesanan.vb               # Form Transaksi Pemesanan (Master-Detail, Multi-Slot)
+│   │   ├── frmPemesanan.Designer.vb
+│   │   └── frmPemesanan.resx
 │   ├── Modules/                          # Modul Logika Bisnis & Koneksi
-│   │   ├── ModAutoNumber.vb              # Modul penomoran otomatis
+│   │   ├── ModAutoNumber.vb              # Modul penomoran otomatis via SP & MySqlTransaction
 │   │   ├── ModErrorHandler.vb            # Modul penanganan error & logger
 │   │   ├── ModKoneksi.vb                 # Modul koneksi database MySQL reusable
 │   │   ├── ModSesi.vb                    # Modul state sesi pengguna yang login
@@ -245,6 +239,5 @@ SIPELA-Sistem-Informasi-Pemesanan-Arung-Futsal/
 │       ├── Application.Designer.vb       # Konfigurasi startup form (frmLogin)
 │       └── Application.myapp
 ├── AGENTS.md                             # Pedoman aturan agen pengembang
-└── README.md                             # Dokumentasi proyek & skrip video demo
+└── README.md                             # Dokumentasi proyek & skrip video demo Week 11
 ```
-

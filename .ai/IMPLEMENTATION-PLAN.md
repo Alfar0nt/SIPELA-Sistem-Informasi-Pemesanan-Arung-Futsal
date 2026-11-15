@@ -155,6 +155,27 @@ Total **8 fase**, diurutkan berdasarkan dependensi. Seluruh fase 1 s.d. 8 telah 
 
 **Checkpoint**: CRUD Master Users lengkap dengan hashing SHA-256, proteksi FK, hard/soft delete, dan icon tombol berhasil dikompilasi. [x]
 
+## Fase 9: Transaksi Pemesanan Lapangan (Master-Detail Form) — Week 11
+
+**Tujuan**: Mengimplementasikan Form Transaksi Pemesanan Master-Detail (`frmPemesanan`) dengan Multi-Slot, Anti Double-Booking, Perhitungan Realtime, Opsi DP Terbayar, dan Full CRUD.
+
+| # | Task | Detail | Status | File Output |
+|---|------|--------|--------|-------------|
+| 9.1 | Designer `frmPemesanan` | 2 Tab (Input Create & Daftar Riwayat Read/Update/Delete), Header GroupBox, Detail Slot GroupBox, DataGridView Detail & Riwayat | [x] Selesai | `SIPELA/Forms/frmPemesanan.Designer.vb` |
+| 9.2 | Atomic Auto-Numbering | Support transaksi `MySqlTransaction` dan fallback query di `ModAutoNumber.vb` | [x] Selesai | `SIPELA/Modules/ModAutoNumber.vb` |
+| 9.3 | Database ComboBoxes | `cboLapangan` terhubung ke tabel `lapangan` (`is_active = TRUE`), `cboKasir` ke tabel `users` | [x] Selesai | `SIPELA/Forms/frmPemesanan.vb` |
+| 9.4 | Jam Operasional 1 Jam | Pilihan 16 slot per jam dari `08:00 - 09:00` s.d. `23:00 - 00:00` | [x] Selesai | ↑ |
+| 9.5 | Multi-Slot Basket & Anti Double-Booking | Validasi duplikasi slot di keranjang lokal dan query verifikasi ke database MySQL | [x] Selesai | ↑ |
+| 9.6 | Automatic Calculation | Subtotal slot, Grand Total sewa, dan estimasi minimal DP (30%) terhitung otomatis | [x] Selesai | ↑ |
+| 9.7 | Create (Simpan Order Atomik) | `conn.BeginTransaction()`, insert `pemesanan`, loop insert `detail_pemesanan`, insert `pembayaran` jika opsi DP dicentang | [x] Selesai | ↑ |
+| 9.8 | Read (Riwayat & Detail Slot) | DataGridView riwayat pemesanan terformat rapi + tombol Lihat Detail Slot terpilih | [x] Selesai | ↑ |
+| 9.9 | Update (Ubah Status & Pelunasan) | Transisi status 'Menunggu DP' -> 'DP Terbayar' / 'Lunas', catat transaksi pembayaran terkait | [x] Selesai | ↑ |
+| 9.10 | Delete (Batalkan Booking) | Soft cancel booking (`status = 'Kedaluwarsa'`), nonaktifkan slot (`aktif = FALSE`) untuk membebaskan jadwal | [x] Selesai | ↑ |
+| 9.11 | Button Styling | Seluruh tombol CRUD dilengkapi icon 16x16 px dan layout sesuai standar via `ModUIHelper` | [x] Selesai | ↑ |
+| 9.12 | Integrasi Menu Utama | `btnPemesanan` di `frmMenuUtama` terhubung untuk membuka `frmPemesanan` | [x] Selesai | `SIPELA/Forms/frmMenuUtama.vb` |
+
+**Checkpoint**: Form Transaksi Pemesanan Master-Detail berhasil dikompilasi dengan 0 error dan 0 warning. [x]
+
 ---
 
 ## Dependency Graph
@@ -169,6 +190,8 @@ flowchart TD
     P5 --> P6["[x] Fase 6: frmMenuUtama"]
     P6 --> P7["[x] Fase 7: frmMasterLapangan"]
     P6 --> P8["[x] Fase 8: frmMasterUsers"]
+    P6 --> P9["[x] Fase 9: frmPemesanan (Master-Detail)"]
+    P4 --> P9
 ```
 
 ---
@@ -196,3 +219,5 @@ flowchart TD
 | 17 | `Database/migration_jenis_lantai.sql` | 2 | [x] Selesai | Skrip migrasi tabel master `jenis_lantai` |
 | 18 | `SIPELA/Modules/ModUIHelper.vb` | 4 | [x] Selesai | Helper style tombol (icon 16×16, alignment) |
 | 19 | `SIPELA/Resources/Icons/` | 4 | [x] Selesai | Icon PNG 16×16 px (insert, update, delete, clear, deactivate) |
+| 20 | `SIPELA/Forms/frmPemesanan.vb` | 9 | [x] Selesai | Form transaksi Master-Detail logic, multi-slot & anti double-booking |
+| 21 | `SIPELA/Forms/frmPemesanan.Designer.vb` | 9 | [x] Selesai | Form transaksi Master-Detail UI designer (2 tab: Input & Riwayat) |

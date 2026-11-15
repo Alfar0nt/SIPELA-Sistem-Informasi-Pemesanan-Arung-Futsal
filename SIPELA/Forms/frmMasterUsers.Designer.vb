@@ -1,4 +1,4 @@
-Namespace Forms
+﻿Namespace Forms
 
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
     Partial Class frmMasterUsers

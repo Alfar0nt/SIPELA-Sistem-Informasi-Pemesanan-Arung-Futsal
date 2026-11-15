@@ -13,5 +13,8 @@
     <Compile Update="Forms\frmMenuUtama.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Forms\frmPemesanan.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>
