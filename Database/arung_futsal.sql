@@ -223,11 +223,11 @@ SELECT
   DATE_FORMAT(dp.`tanggal_main`, '%Y-%m') AS `periode`,
   COUNT(dp.`id_detail`) AS `slot_terisi`,
   -- Total kapasitas per bulan: lapangan aktif * 16 slot * hari dalam bulan
-  ((SELECT COUNT(*) FROM `lapangan` WHERE `is_active` = TRUE) * 16 * DAY(LAST_DAY(dp.`tanggal_main`))) AS `kapasitas_slot`,
-  ROUND((COUNT(dp.`id_detail`) / NULLIF(((SELECT COUNT(*) FROM `lapangan` WHERE `is_active` = TRUE) * 16 * DAY(LAST_DAY(dp.`tanggal_main`))), 0)) * 100, 2) AS `persen_okupansi`
+  ((SELECT COUNT(*) FROM `lapangan` WHERE `is_active` = TRUE) * 16 * DAY(LAST_DAY(MAX(dp.`tanggal_main`)))) AS `kapasitas_slot`,
+  ROUND((COUNT(dp.`id_detail`) / NULLIF(((SELECT COUNT(*) FROM `lapangan` WHERE `is_active` = TRUE) * 16 * DAY(LAST_DAY(MAX(dp.`tanggal_main`)))), 0)) * 100, 2) AS `persen_okupansi`
 FROM `detail_pemesanan` dp
 WHERE dp.`aktif` = TRUE
-GROUP BY DATE_FORMAT(dp.`tanggal_main`, '%Y-%m'), LAST_DAY(dp.`tanggal_main`);
+GROUP BY DATE_FORMAT(dp.`tanggal_main`, '%Y-%m');
 
 -- View: v_laporan_bulanan
 CREATE OR REPLACE VIEW `v_laporan_bulanan` AS

@@ -1,21 +1,22 @@
 # TRD — Technical Requirements Document
 
-> **Versi**: 1.0 — Week 10 Deliverable  
-> **Tanggal**: 4 November 2026
+> **Versi**: 1.2 — Week 10, Week 11, & Week 12 Deliverable  
+> **Tanggal**: 18 November 2026
 
 ---
 
 ## 1. Technology Stack
 
-| Komponen | Teknologi | Versi |
-|----------|-----------|-------|
-| **Runtime** | .NET | 10.0 |
-| **Bahasa** | Visual Basic .NET (VB.NET) | — |
-| **UI Framework** | Windows Forms | .NET 10 |
-| **IDE** | Visual Studio | Terinstall |
-| **Database** | MySQL | Running di localhost:3306 |
-| **DB Connector** | MySql.Data (Connector/NET) | NuGet package |
-| **Hashing** | System.Security.Cryptography (SHA-256) | Built-in .NET |
+| Komponen | Teknologi | Versi / Catatan |
+|----------|-----------|-----------------|
+| **Runtime** | .NET | `net10.0-windows` (.NET 10.0) |
+| **Bahasa** | Visual Basic .NET (VB.NET) | `Option Strict On`, `Option Explicit On` |
+| **UI Framework** | Windows Forms | .NET 10 WinForms (Designer-compatible) |
+| **IDE** | Visual Studio 2022+ / .NET CLI | `SIPELA.slnx` |
+| **Database** | MySQL / MariaDB | Running di `localhost:3306` (`arung_futsal`) |
+| **DB Connector** | `MySql.Data` (Connector/NET) | NuGet `v26.10.0` |
+| **Hashing** | `System.Security.Cryptography` (SHA-256) | Built-in .NET |
+| **Reporting & Export** | `System.Drawing.Printing.PrintDocument` + `PrintPreviewDialog` + Native UTF-8 BOM CSV Exporter | 0 dependency eksternal, 100% stabil di .NET 10 |
 | **OS** | Windows 11 | — |
 
 ---
@@ -23,32 +24,31 @@
 ## 2. Arsitektur Aplikasi
 
 ```
-┌──────────────────────────────────────────────────┐
-│                   SIPELA Desktop                  │
-├──────────────────────────────────────────────────┤
-│  Presentation Layer (Windows Forms)               │
-│  ┌────────────┐ ┌─────────────────┐ ┌──────────┐ │
-│  │ frmLogin   │ │ frmMenuUtama    │ │ frm      │ │
-│  │ frmMaster  │ │ frmMasterUsers  │ │ Pemesanan│ │
-│  │ Lapangan   │ │                 │ │          │ │
-│  └────────────┘ └─────────────────┘ └──────────┘ │
-├──────────────────────────────────────────────────┤
-│  Business Logic Layer (Modules)                   │
-│  ┌────────────┐ ┌──────────────┐ ┌─────────────┐ │
-│  │ ModKoneksi │ │ ModAutoNumber│ │ ModError    │ │
-│  │            │ │              │ │ Handler     │ │
-│  └────────────┘ └──────────────┘ └─────────────┘ │
-│  ┌────────────┐                                   │
-│  │ ModSesi    │                                   │
-│  └────────────┘                                   │
-├──────────────────────────────────────────────────┤
-│  Data Layer (MySQL via MySql.Data)                │
-│  ┌────────────────────────────────────────────┐   │
-│  │ arung_futsal database                      │   │
-│  │ Tables: users, lapangan, pemesanan,        │   │
-│  │   detail_pemesanan, pembayaran, penomoran  │   │
-│  └────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────┐
+│                        SIPELA Desktop                          │
+├────────────────────────────────────────────────────────────────┤
+│  Presentation Layer (Windows Forms — Namespace SIPELA.Forms)   │
+│  ┌──────────────┐ ┌───────────────────┐ ┌────────────────────┐ │
+│  │ frmLogin     │ │ frmMasterLapangan │ │ frmPemesanan       │ │
+│  │ frmMenuUtama │ │ frmMasterUsers    │ │ frmLaporan (Owner) │ │
+│  └──────────────┘ └───────────────────┘ └────────────────────┘ │
+├────────────────────────────────────────────────────────────────┤
+│  Business Logic & Utility Layer (Modules)                      │
+│  ┌──────────────┐ ┌───────────────────┐ ┌────────────────────┐ │
+│  │ ModKoneksi   │ │ ModAutoNumber     │ │ ModErrorHandler    │ │
+│  │ ModSesi      │ │ ModUIHelper       │ │                    │ │
+│  └──────────────┘ └───────────────────┘ └────────────────────┘ │
+├────────────────────────────────────────────────────────────────┤
+│  Data Layer (MySQL via MySql.Data)                             │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ Database: arung_futsal                                   │  │
+│  │ Tables : users, jenis_lantai, lapangan, pemesanan,       │  │
+│  │          detail_pemesanan, pembayaran, penomoran         │  │
+│  │ Views  : v_jadwal_lapangan, v_pendapatan_bulanan,        │  │
+│  │          v_okupansi_bulanan, v_laporan_bulanan           │  │
+│  │ SP     : sp_nomor_berikutnya, sp_kedaluwarsakan_pemesanan│  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -57,34 +57,36 @@
 
 ```
 SIPELA-Sistem-Informasi-Pemesanan-Arung-Futsal/
-├── .ai/                          # Planning documents
-│   ├── PRD.md
-│   ├── TRD.md
+├── .ai/                                  # Planning & architecture documents
 │   ├── APP-FLOW.md
+│   ├── DESIGN.md
 │   ├── IMPLEMENTATION-PLAN.md
-│   └── DESIGN.md
-├── SIPELA/                       # VB.NET Solution root
-│   ├── SIPELA.sln                # Solution file
-│   └── SIPELA/                   # Project folder
-│       ├── SIPELA.vbproj         # Project file (.NET 10)
-│       ├── Program.vb            # Entry point
-│       ├── Forms/
-│       │   ├── frmLogin.vb             # Login form
-│       │   ├── frmLogin.Designer.vb
-│       │   ├── frmMenuUtama.vb         # Main menu form
-│       │   ├── frmMenuUtama.Designer.vb
-│       │   ├── frmMasterLapangan.vb    # Master lapangan form
-│       │   ├── frmMasterLapangan.Designer.vb
-│       │   ├── frmMasterUsers.vb       # Master users form
-│       │   └── frmMasterUsers.Designer.vb
-│       ├── Modules/
-│       │   ├── ModKoneksi.vb           # Database connection
-│       │   ├── ModAutoNumber.vb        # Auto-numbering logic
-│       │   ├── ModErrorHandler.vb      # Error handling + logging
-│       │   └── ModSesi.vb              # Session (logged-in user)
-│       └── Resources/                  # Icons, images (optional)
+│   ├── PRD.md
+│   └── TRD.md
 ├── Database/
-│   └── arung_futsal.sql          # Database creation script
+│   ├── arung_futsal.sql                  # Full database DDL, SP, Views, Seed data
+│   └── migration_jenis_lantai.sql        # Supporting migration for jenis_lantai
+├── SIPELA/                               # VB.NET WinForms Solution & Project
+│   ├── SIPELA.slnx                       # Solution file
+│   ├── SIPELA.vbproj                     # SDK Project (.NET 10, explicit SubType/DependentUpon)
+│   ├── ApplicationEvents.vb
+│   ├── Forms/
+│   │   ├── frmLogin.{vb,Designer.vb,resx}
+│   │   ├── frmMenuUtama.{vb,Designer.vb,resx}
+│   │   ├── frmMasterLapangan.{vb,Designer.vb,resx}
+│   │   ├── frmMasterUsers.{vb,Designer.vb,resx}
+│   │   ├── frmPemesanan.{vb,Designer.vb,resx}
+│   │   └── frmLaporan.{vb,Designer.vb,resx}
+│   ├── Modules/
+│   │   ├── ModKoneksi.vb                 # Reusable MySQL connection
+│   │   ├── ModAutoNumber.vb              # Atomic BKG/PAY auto-number + MySqlTransaction
+│   │   ├── ModErrorHandler.vb            # Error dialogs & logging
+│   │   ├── ModSesi.vb                    # Active user session & role checks
+│   │   └── ModUIHelper.vb                # Standard 16×16 button icons & alignment
+│   ├── Resources/Icons/                  # 16×16 PNG icons (insert, update, delete, clear, deactivate)
+│   └── My Project/
+│       ├── Application.Designer.vb       # Startup form: frmLogin
+│       └── Application.myapp
 ├── AGENTS.md
 └── README.md
 ```
@@ -93,154 +95,61 @@ SIPELA-Sistem-Informasi-Pemesanan-Arung-Futsal/
 
 ## 4. Database Specification
 
-### 4.1 Tabel
+### 4.1 Tabel Utama
 
-#### `users`
-| Kolom | Tipe | Constraint | Keterangan |
-|-------|------|-----------|------------|
-| `id_user` | INT | PK, AUTO_INCREMENT | — |
-| `username` | VARCHAR(50) | UNIQUE, NOT NULL | — |
-| `password_hash` | VARCHAR(64) | NOT NULL | SHA-256 hex |
-| `nama_lengkap` | VARCHAR(100) | NOT NULL | — |
-| `role` | ENUM('Admin','Owner') | NOT NULL | — |
-| `is_active` | BOOLEAN | DEFAULT TRUE | Soft delete |
-| `gagal_login` | TINYINT | DEFAULT 0 | Counter gagal login |
-| `terkunci_sampai` | DATETIME | NULL | Lock timestamp |
-| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | — |
-| `updated_at` | DATETIME | ON UPDATE CURRENT_TIMESTAMP | — |
+| Tabel | Primary Key | Relasi / Constraint Kunci | Status Implementasi |
+|---|---|---|---|
+| `users` | `id_user` | `UNIQUE(username)`, `ENUM('Admin','Owner')`, SHA-256 hash, brute-force lock | ✅ `frmLogin`, `frmMasterUsers` |
+| `jenis_lantai` | `id_jenis` | `UNIQUE(nama_jenis)` — sumber ComboBox DB | ✅ `frmMasterLapangan` |
+| `lapangan` | `id_lapangan` | `UNIQUE(nama_lapangan)`, `CHECK(harga_per_jam > 0)` | ✅ `frmMasterLapangan`, `frmPemesanan`, `frmLaporan` |
+| `pemesanan` | `id_pemesanan` | `UNIQUE(kode_booking)`, FK `id_user`, `ENUM('Menunggu DP','DP Terbayar','Lunas','Kedaluwarsa')` | ✅ `frmPemesanan`, `frmLaporan` |
+| `detail_pemesanan` | `id_detail` | FK `id_pemesanan` & `id_lapangan`, `CHECK(jam_mulai BETWEEN 8 AND 23)`, `UNIQUE(id_lapangan, tanggal_main, jam_mulai, aktif)` | ✅ `frmPemesanan`, `frmLaporan` |
+| `pembayaran` | `id_pembayaran` | `UNIQUE(no_transaksi)`, `UNIQUE(id_pemesanan, jenis_pembayaran)`, FK `id_pemesanan` & `id_user` | ✅ `frmPemesanan`, `frmLaporan` |
+| `penomoran` | `(jenis, tanggal)` | Atomic counter harian untuk prefix `BKG` & `PAY` | ✅ `ModAutoNumber` |
 
-#### `jenis_lantai` (Master Pendukung ComboBox)
-| Kolom | Tipe | Constraint | Keterangan |
-|-------|------|-----------|------------|
-| `id_jenis` | INT | PK, AUTO_INCREMENT | — |
-| `nama_jenis` | VARCHAR(50) | UNIQUE, NOT NULL | Rumput Sintetis, Vinyl, Interlock, dll |
+### 4.2 Stored Procedures & Views
 
-#### `lapangan`
-| Kolom | Tipe | Constraint | Keterangan |
-|-------|------|-----------|------------|
-| `id_lapangan` | INT | PK, AUTO_INCREMENT | — |
-| `nama_lapangan` | VARCHAR(50) | UNIQUE, NOT NULL | — |
-| `jenis_lantai` | VARCHAR(50) | NOT NULL | vinyl/rumput sintetis/dll |
-| `harga_per_jam` | DECIMAL(10,0) | NOT NULL, CHECK > 0 | — |
-| `is_active` | BOOLEAN | DEFAULT TRUE | Soft delete |
-| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | — |
-| `updated_at` | DATETIME | ON UPDATE CURRENT_TIMESTAMP | — |
-
-#### `pemesanan` (struktur untuk SQL script, belum diimplementasi di form)
-| Kolom | Tipe | Constraint | Keterangan |
-|-------|------|-----------|------------|
-| `id_pemesanan` | INT | PK, AUTO_INCREMENT | — |
-| `kode_booking` | VARCHAR(20) | UNIQUE, NOT NULL | BKG-YYYYMMDD-XXXX |
-| `id_user` | INT | FK → users | Admin yang input |
-| `nama_pemesan` | VARCHAR(100) | NOT NULL | — |
-| `no_telepon` | VARCHAR(15) | NOT NULL | — |
-| `waktu_dibuat` | DATETIME | DEFAULT CURRENT_TIMESTAMP | — |
-| `batas_bayar` | DATETIME | NOT NULL | +15 menit dari waktu_dibuat |
-| `total_sewa` | DECIMAL(12,0) | NOT NULL, CHECK > 0 | — |
-| `jumlah_dp` | DECIMAL(12,0) | NOT NULL, CHECK > 0 | 30% dari total_sewa |
-| `status_pemesanan` | ENUM('Menunggu DP','DP Terbayar','Lunas','Kedaluwarsa') | NOT NULL | — |
-| `catatan` | TEXT | NULL | — |
-
-#### `detail_pemesanan`
-| Kolom | Tipe | Constraint | Keterangan |
-|-------|------|-----------|------------|
-| `id_detail` | INT | PK, AUTO_INCREMENT | — |
-| `id_pemesanan` | INT | FK → pemesanan | — |
-| `id_lapangan` | INT | FK → lapangan | — |
-| `tanggal_main` | DATE | NOT NULL | — |
-| `jam_mulai` | TINYINT | NOT NULL, CHECK 8–23 | — |
-| `harga_slot` | DECIMAL(10,0) | NOT NULL | Snapshot harga saat booking |
-| `aktif` | BOOLEAN | DEFAULT TRUE | NULL = slot dilepas |
-
-**UNIQUE** constraint: `(id_lapangan, tanggal_main, jam_mulai, aktif)` → anti double booking
-
-#### `pembayaran`
-| Kolom | Tipe | Constraint | Keterangan |
-|-------|------|-----------|------------|
-| `id_pembayaran` | INT | PK, AUTO_INCREMENT | — |
-| `no_transaksi` | VARCHAR(20) | UNIQUE, NOT NULL | PAY-YYYYMMDD-XXXX |
-| `id_pemesanan` | INT | FK → pemesanan | — |
-| `id_user` | INT | FK → users | Admin yang catat |
-| `jenis_pembayaran` | ENUM('DP','Pelunasan') | NOT NULL | — |
-| `jumlah_bayar` | DECIMAL(12,0) | NOT NULL, CHECK > 0 | — |
-| `metode_pembayaran` | ENUM('Tunai','QRIS','Transfer') | NOT NULL | — |
-| `waktu_bayar` | DATETIME | DEFAULT CURRENT_TIMESTAMP | — |
-
-**UNIQUE** constraint: `(id_pemesanan, jenis_pembayaran)` → max 1 DP + 1 Pelunasan
-
-#### `penomoran`
-| Kolom | Tipe | Constraint | Keterangan |
-|-------|------|-----------|------------|
-| `jenis` | VARCHAR(10) | PK (composite) | 'BKG' atau 'PAY' |
-| `tanggal` | DATE | PK (composite) | — |
-| `nomor_terakhir` | INT | DEFAULT 0 | — |
-
-### 4.2 Stored Procedures
-
-| Nama | Fungsi |
-|------|--------|
-| `sp_nomor_berikutnya(p_jenis, p_tanggal, OUT p_nomor)` | Atomically increment dan return nomor berikutnya |
-| `sp_kedaluwarsakan_pemesanan()` | Update status pemesanan yang melewati batas bayar |
-
-### 4.3 Views
-
-| Nama | Fungsi |
-|------|--------|
-| `v_jadwal_lapangan` | Gabungan jadwal slot per lapangan per tanggal |
-| `v_pendapatan_bulanan` | Agregasi pendapatan per bulan |
-| `v_okupansi_bulanan` | Persentase okupansi per bulan |
-| `v_laporan_bulanan` | Gabungan pendapatan + okupansi + MoM |
-
-### 4.4 Sample Data
-
-| Tabel | Data |
-|-------|------|
-| `users` | owner/owner123 (Owner), admin/admin123 (Admin) |
-| `lapangan` | Lapangan A (Vinyl, Rp 100.000), Lapangan B (Rumput Sintetis, Rp 120.000), Lapangan C (Vinyl, Rp 100.000) |
+| Objek | Tipe | Kegunaan |
+|---|---|---|
+| `sp_nomor_berikutnya` | Stored Procedure | Increment atomik nomor urut `BKG` / `PAY` harian |
+| `sp_kedaluwarsakan_pemesanan` | Stored Procedure | Kedaluwarsakan booking yang melewati batas bayar |
+| `v_jadwal_lapangan` | View | Status slot per lapangan & tanggal |
+| `v_pendapatan_bulanan` | View | Agregasi pendapatan & transaksi pembayaran per bulan |
+| `v_okupansi_bulanan` | View | Persentase okupansi slot aktif per bulan |
+| `v_laporan_bulanan` | View | Gabungan pendapatan & okupansi bulanan (digunakan di Tab 2 `frmLaporan`, lengkap dengan fallback query) |
 
 ---
 
 ## 5. Modul Pendukung
 
-### 5.1 `ModKoneksi.vb`
-- Connection string: `Server=localhost;Port=3306;Database=arung_futsal;Uid=root;Pwd=;CharSet=utf8mb4;`
-- Function `BukaKoneksi() As MySqlConnection` — buka dan return koneksi baru
-- Error handling: tangkap `MySqlException` dan tampilkan pesan koneksi gagal
-
-### 5.2 `ModAutoNumber.vb`
-- Memanggil `sp_nomor_berikutnya` untuk generate kode booking dan nomor transaksi
-- Untuk Week 10: belum digunakan di form master, tapi modul sudah disiapkan
-
-### 5.3 `ModErrorHandler.vb`
-- `Sub TampilkanError(kegiatan As String, ex As Exception)` — MessageBox ke user + log ke file
-- `Sub LogError(ex As Exception)` — tulis detail error ke file log
-- Try...Catch wrapper
-
-### 5.4 `ModSesi.vb`
-- `Property IdUser As Integer` — ID user yang login
-- `Property Username As String`
-- `Property NamaLengkap As String`
-- `Property Role As String` — "Admin" atau "Owner"
-- `Sub Logout()` — reset semua property
+- **`ModKoneksi.vb`**: Koneksi terpusat ke `arung_futsal` (`Server=localhost;Port=3306;Database=arung_futsal;Uid=root;Pwd=;CharSet=utf8mb4;`) dengan handling `MySqlException`.
+- **`ModAutoNumber.vb`**: Memanggil `sp_nomor_berikutnya` dengan dukungan `MySqlTransaction` dan 2 lapis fallback query.
+- **`ModErrorHandler.vb`**: Wrapper `TampilkanError`, `TampilkanPeringatan`, `TampilkanInfo`, `Konfirmasi`, dan pencatatan log error.
+- **`ModSesi.vb`**: Menyimpan `IdUser`, `Username`, `NamaLengkap`, `Role`, serta properti `IsLoggedIn`, `IsOwner`, `IsAdmin`.
+- **`ModUIHelper.vb`**: Memuat icon PNG 16×16 px lokal (dengan fallback GDI+) dan menerapkan properti tombol (`ImageAlign = MiddleCenter`, `TextAlign = MiddleRight`, `TextImageRelation = ImageBeforeText`).
 
 ---
 
-## 6. Security
+## 6. Spesifikasi Teknis Pelaporan (`frmLaporan` — Week 12)
 
-| Aspek | Implementasi |
-|-------|-------------|
-| Password storage | SHA-256 hash (bukan plaintext) |
-| Login brute force | Lock akun setelah 5x gagal, unlock otomatis setelah 15 menit |
-| SQL Injection | Parameterized queries (`@parameter`) di semua query |
-| Role-based access | Menu di `frmMenuUtama` di-enable/disable berdasarkan `ModSesi.Role` |
-| Soft delete | Data tidak dihapus permanen, hanya `is_active = FALSE` |
+1. **Query Relasional Terparameter**:
+   - Tab 1 melakukan `INNER JOIN` pada `detail_pemesanan`, `pemesanan`, `lapangan`, `users` dan `LEFT JOIN` subquery agregasi `pembayaran` berdasarkan filter tanggal (`Tanggal Main` atau `Tanggal Pesan`), `id_lapangan`, `status_pemesanan`, dan pencarian teks.
+   - Tab 2 membaca View `v_laporan_bulanan` dengan filter tahun + fallback query langsung jika view belum terpasang.
+2. **Agregasi Anti Double-Counting & Null-Safe**:
+   - Menggunakan `HashSet(Of Integer)` atas `id_pemesanan` agar `Total Pembayaran Masuk` dan `Sisa Belum Lunas` tidak terhitung ganda pada booking multi-slot.
+   - Menggunakan helper `SafeString`, `SafeInt`, `SafeDecimal`, `SafeDate` untuk mencegah error `InvalidCastException` saat nilai `DBNull`.
+3. **Ekspor CSV (Excel-Ready)**:
+   - Encoding `UTF8Encoding(True)` (UTF-8 dengan BOM) + escaping RFC 4180 agar file langsung terbuka rapi di Microsoft Excel beserta header filter dan blok ringkasan agregasi.
+4. **Cetak & Save as PDF (`PrintDocument` + `PrintPreviewDialog`)**:
+   - Mendukung 3 mode cetak: Laporan Transaksi & Pendapatan (Landscape multi-halaman otomatis), Struk / Invoice Booking Terpilih (Portrait dinamis per `kode_booking`), dan Ringkasan Bulanan & Okupansi (Portrait).
 
 ---
 
-## 7. NuGet Packages
+## 7. Security & NuGet Packages
 
-| Package | Kegunaan | Catatan |
-|---------|----------|---------|
-| `MySql.Data` | MySQL Connector/NET | User akan install manual |
-| *(future)* `Microsoft.Reporting.WinForms` | RDLC ReportViewer | Untuk frmLaporan nanti |
-
+| Aspek / Package | Detail |
+|---|---|
+| **Password & Auth** | SHA-256 hash + lock 15 menit setelah 5× gagal login |
+| **SQL Injection** | 100% Parameterized queries (`@parameter`) |
+| **Role-Based Access** | `frmMasterUsers` dan `frmLaporan` dibatasi khusus **Owner** (dijaga di `frmMenuUtama` sekaligus di `Form_Load` masing-masing form) |
+| **NuGet: `MySql.Data` v26.10.0** | Terpasang di `SIPELA.vbproj` |

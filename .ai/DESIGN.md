@@ -1,7 +1,7 @@
 # DESIGN — UI Design Specification
 
-> **Versi**: 1.0 — Week 10 Deliverable  
-> **Tanggal**: 4 November 2026  
+> **Versi**: 1.2 — Week 10, Week 11, & Week 12 Deliverable  
+> **Tanggal**: 18 November 2026  
 > **Style**: Sederhana / Standard Windows Forms
 
 ---
@@ -247,6 +247,44 @@
 | Lihat Detail Slot | Button | `btnLihatDetail` | Icon 16x16 px `update.png`, rincian dialog slot terpilih |
 | Ubah Status / Pelunasan | Button | `btnUbahStatus` | Icon 16x16 px `update.png`, transisi status & pembayaran pelunasan |
 | Batalkan / Hapus Booking | Button | `btnBatalkanBooking` | Icon 16x16 px `delete.png`, soft cancel & pembebasan slot jadwal |
+
+---
+
+### 3.5 `frmLaporan` (Form Laporan Pendapatan, Transaksi, & Okupansi — Week 12, Khusus Owner)
+
+| Property | Value |
+|----------|-------|
+| Size | 1060 × 680 |
+| StartPosition | CenterParent |
+| Hak Akses | Khusus **Owner** (`ModSesi.IsOwner`) |
+
+#### Kontrol Detail Tab 1 — Laporan Transaksi & Pendapatan
+| Nama di Form | Toolbox | Properties Name | Keterangan |
+|-------------|---------|-----------------|------------|
+| Filter Berdasarkan | ComboBox | `cboJenisTanggal` | DropDownList: Tanggal Main, Tanggal Pesan |
+| Tanggal Awal | DateTimePicker | `dtpDari` | Format Short, validasi `dtpDari <= dtpSampai` |
+| Tanggal Akhir | DateTimePicker | `dtpSampai` | Format Short |
+| Filter Lapangan | ComboBox | `cboLapangan` | DropDownList dinamis dari tabel `lapangan` (+ Semua Lapangan) |
+| Filter Status | ComboBox | `cboStatus` | DropDownList: Semua Status, Menunggu DP, DP Terbayar, Lunas, Kedaluwarsa |
+| Pencarian | TextBox | `txtCari` | Filter kode booking, nama pemesan, telepon, kasir |
+| Tampilkan Data | Button | `btnTampilkan` | Jalankan query relasional & hitung agregasi |
+| Reset Filter | Button | `btnResetFilter` | Kembalikan filter ke default bulan berjalan |
+| 5 Kartu Ringkasan | Label | `lblTotalBooking`, `lblTotalSlot`, `lblGrandTotalSewa`, `lblTotalBayarMasuk`, `lblSisaBelumLunas` | Metrik agregasi bebas double-counting & null-safe |
+| Grid Laporan Relasional | DataGridView | `dgvLaporan` | ReadOnly, FullRowSelect, format Rupiah N0 & tanggal |
+| Export CSV / Excel | Button | `btnExportCsv` | Ekspor UTF-8 BOM CSV + metadata & ringkasan agregasi |
+| Cetak / PDF Laporan | Button | `btnCetakLaporan` | PrintPreviewDialog Landscape multi-halaman (bisa Save as PDF) |
+| Cetak Struk Booking | Button | `btnCetakStruk` | PrintPreviewDialog Portrait invoice dinamis per `kode_booking` |
+| Kembali | Button | `btnTutup` | Tutup form |
+
+#### Kontrol Detail Tab 2 — Ringkasan Bulanan & Okupansi
+| Nama di Form | Toolbox | Properties Name | Keterangan |
+|-------------|---------|-----------------|------------|
+| Pilih Tahun | ComboBox | `cboTahun` | DropDownList: Semua Tahun + tahun dari data |
+| Muat Ulang Ringkasan | Button | `btnRefreshBulanan` | Muat View `v_laporan_bulanan` (+ fallback query) |
+| 4 Kartu Ringkasan Bulanan | Label | `lblBlnTotalPendapatan`, `lblBlnTotalTransaksi`, `lblBlnTotalSlot`, `lblBlnRataOkupansi` | Agregasi seluruh periode yang ditampilkan |
+| Grid Bulanan & Okupansi | DataGridView | `dgvBulanan` | Periode, Total Pendapatan, Transaksi, Slot Terisi, Kapasitas, Okupansi (%) |
+| Export CSV Bulanan | Button | `btnExportBulananCsv` | Ekspor ringkasan bulanan ke CSV Excel-ready |
+| Cetak / PDF Ringkasan | Button | `btnCetakBulanan` | PrintPreviewDialog Portrait ringkasan bulanan & okupansi |
 
 ---
 

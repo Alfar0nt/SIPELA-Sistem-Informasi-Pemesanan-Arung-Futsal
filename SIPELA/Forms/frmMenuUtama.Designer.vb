@@ -165,7 +165,7 @@ Namespace Forms
             Me.btnLaporan.Cursor = System.Windows.Forms.Cursors.Hand
             Me.btnLaporan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
             Me.btnLaporan.Font = New System.Drawing.Font("Segoe UI Semibold", 11.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
-            Me.btnLaporan.ForeColor = System.Drawing.Color.Gray
+            Me.btnLaporan.ForeColor = System.Drawing.Color.DarkSlateBlue
             Me.btnLaporan.Location = New System.Drawing.Point(450, 160)
             Me.btnLaporan.Margin = New System.Windows.Forms.Padding(10)
             Me.btnLaporan.Name = "btnLaporan"

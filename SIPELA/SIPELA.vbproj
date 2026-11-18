@@ -89,6 +89,16 @@
     <EmbeddedResource Update="Forms\frmPemesanan.resx">
       <DependentUpon>frmPemesanan.vb</DependentUpon>
     </EmbeddedResource>
+
+    <Compile Update="Forms\frmLaporan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\frmLaporan.Designer.vb">
+      <DependentUpon>frmLaporan.vb</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Forms\frmLaporan.resx">
+      <DependentUpon>frmLaporan.vb</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

@@ -1,14 +1,14 @@
 # IMPLEMENTATION-PLAN — Rencana Implementasi
 
-> **Versi**: 1.0 — Week 10 Deliverable  
-> **Tanggal**: 4 November 2026  
-> **Status**: Selesai Diimplementasikan (Menunggu Eksekusi Script SQL & Run Testing oleh Pengguna)
+> **Versi**: 1.2 — Week 10, Week 11, & Week 12 Deliverable  
+> **Tanggal**: 18 November 2026  
+> **Status**: Selesai Diimplementasikan (Terverifikasi `dotnet build` — 0 Warning, 0 Error)
 
 ---
 
 ## Ringkasan
 
-Total **8 fase**, diurutkan berdasarkan dependensi. Seluruh fase 1 s.d. 8 telah berhasil diimplementasikan dan diverifikasi dengan `dotnet build` tanpa error.
+Total **10 fase**, diurutkan berdasarkan dependensi. Seluruh fase 1 s.d. 10 (Week 10 Master Forms, Week 11 Transaksi Master-Detail, dan Week 12 Laporan & Ekspor/Cetak) telah berhasil diimplementasikan dan diverifikasi tanpa error.
 
 ---
 
@@ -178,12 +178,31 @@ Total **8 fase**, diurutkan berdasarkan dependensi. Seluruh fase 1 s.d. 8 telah 
 
 ---
 
+## Fase 10: Laporan Pendapatan, Transaksi, & Okupansi (`frmLaporan`) — Week 12
+
+**Tujuan**: Mengimplementasikan Form Laporan Relasional berbasis data transaksi Week 11 dengan filter dinamis, agregasi metrik, ekspor CSV/Excel, pratinjau cetak / Save to PDF, dan pembatasan akses khusus **Owner**.
+
+| # | Task | Detail | Status | File Output |
+|---|------|--------|--------|-------------|
+| 10.1 | Designer & Resource `frmLaporan` | 2 Tab (Transaksi & Pendapatan + Ringkasan Bulanan & Okupansi), 5+4 kartu ringkasan agregasi, filter lengkap, `SubType=Form` & `DependentUpon` di `.vbproj` | [x] Selesai | `SIPELA/Forms/frmLaporan.Designer.vb`, `frmLaporan.resx`, `SIPELA.vbproj` |
+| 10.2 | Query Relasional & Filter | JOIN 5 tabel (`detail_pemesanan`, `pemesanan`, `lapangan`, `users`, agregasi `pembayaran`) dengan filter Jenis Tanggal, Rentang Tanggal, Lapangan, Status, dan Kata Kunci | [x] Selesai | `SIPELA/Forms/frmLaporan.vb` |
+| 10.3 | Agregasi Summary Metrics | Hitung Total Booking, Total Slot Terjual, Grand Total Nilai Sewa, Total Pembayaran Masuk (bebas double-counting), dan Sisa Belum Lunas | [x] Selesai | ↑ |
+| 10.4 | Ringkasan Bulanan & Okupansi | Memanfaatkan View `v_laporan_bulanan` (+ fallback query) dengan filter tahun & 4 kartu ringkasan okupansi | [x] Selesai | ↑ |
+| 10.5 | Export CSV / Excel | Export UTF-8 BOM CSV (RFC 4180) lengkap dengan header filter & blok ringkasan agregasi untuk Tab 1 dan Tab 2 | [x] Selesai | ↑ |
+| 10.6 | Print Preview & Cetak / PDF | `PrintDocument` + `PrintPreviewDialog` untuk 3 mode: Laporan Transaksi (Landscape multi-halaman), Struk/Invoice Booking Terpilih (Portrait dinamis), dan Ringkasan Bulanan | [x] Selesai | ↑ |
+| 10.7 | Validasi & Error Handling | Validasi rentang tanggal (`Dari <= Sampai`), helper null-safe (`DBNull`), penanganan hasil kosong tanpa crash, & proteksi IOException saat export | [x] Selesai | ↑ |
+| 10.8 | Integrasi Menu Utama (Owner Only) | Unmute `btnLaporan` di `frmMenuUtama`, aktifkan khusus `ModSesi.IsOwner`, plus guard role di `frmLaporan_Load` | [x] Selesai | `SIPELA/Forms/frmMenuUtama.vb`, `frmMenuUtama.Designer.vb` |
+
+**Checkpoint**: Form Laporan Week 12 berhasil dikompilasi dengan 0 error dan 0 warning serta siap dibuka di WinForms Designer Visual Studio. [x]
+
+---
+
 ## Dependency Graph
 
 ```mermaid
 flowchart TD
     P1["[x] Fase 1: Project Setup"] --> P2["[x] Fase 2: Database SQL"]
-    P1 --> P3["[x] Fase 3: NuGet (User)"]
+    P1 --> P3["[x] Fase 3: NuGet MySql.Data"]
     P3 --> P4["[x] Fase 4: Modules"]
     P2 --> P4
     P4 --> P5["[x] Fase 5: frmLogin"]
@@ -192,6 +211,8 @@ flowchart TD
     P6 --> P8["[x] Fase 8: frmMasterUsers"]
     P6 --> P9["[x] Fase 9: frmPemesanan (Master-Detail)"]
     P4 --> P9
+    P6 --> P10["[x] Fase 10: frmLaporan (Owner Only)"]
+    P9 --> P10
 ```
 
 ---
@@ -201,15 +222,15 @@ flowchart TD
 | # | File | Fase | Status | Deskripsi |
 |---|------|------|--------|-----------|
 | 1 | `SIPELA/SIPELA.slnx` | 1 | [x] Selesai | Solution file |
-| 2 | `SIPELA/SIPELA.vbproj` | 1 | [x] Selesai | Project file (.NET 10 WinForms) |
-| 3 | `Database/arung_futsal.sql` | 2 | [x] Selesai | SQL script lengkap (6 tabel, 2 SP, 4 view, seed data) |
+| 2 | `SIPELA/SIPELA.vbproj` | 1 | [x] Selesai | Project file (.NET 10 WinForms + explicit Form SubType/DependentUpon) |
+| 3 | `Database/arung_futsal.sql` | 2 | [x] Selesai | SQL script lengkap (7 tabel, 2 SP, 4 view, seed data) |
 | 4 | `SIPELA/Modules/ModKoneksi.vb` | 4 | [x] Selesai | Database connection module (MySQL) |
 | 5 | `SIPELA/Modules/ModSesi.vb` | 4 | [x] Selesai | Session management module (ID, nama, role) |
 | 6 | `SIPELA/Modules/ModErrorHandler.vb` | 4 | [x] Selesai | Error handling & file logger module |
-| 7 | `SIPELA/Modules/ModAutoNumber.vb` | 4 | [x] Selesai | Auto-numbering module via SP |
+| 7 | `SIPELA/Modules/ModAutoNumber.vb` | 4 | [x] Selesai | Auto-numbering module via SP & `MySqlTransaction` |
 | 8 | `SIPELA/Forms/frmLogin.vb` | 5 | [x] Selesai | Login form logic (SHA-256 & 5x brute-force lock) |
 | 9 | `SIPELA/Forms/frmLogin.Designer.vb` | 5 | [x] Selesai | Login form UI designer |
-| 10 | `SIPELA/Forms/frmMenuUtama.vb` | 6 | [x] Selesai | Menu form logic (role-based access) |
+| 10 | `SIPELA/Forms/frmMenuUtama.vb` | 6 | [x] Selesai | Menu form logic (role-based access: Owner & Admin) |
 | 11 | `SIPELA/Forms/frmMenuUtama.Designer.vb` | 6 | [x] Selesai | Menu form UI designer |
 | 12 | `SIPELA/Forms/frmMasterLapangan.vb` | 7 | [x] Selesai | Master lapangan CRUD logic & search |
 | 13 | `SIPELA/Forms/frmMasterLapangan.Designer.vb` | 7 | [x] Selesai | Master lapangan UI designer |
@@ -221,3 +242,6 @@ flowchart TD
 | 19 | `SIPELA/Resources/Icons/` | 4 | [x] Selesai | Icon PNG 16×16 px (insert, update, delete, clear, deactivate) |
 | 20 | `SIPELA/Forms/frmPemesanan.vb` | 9 | [x] Selesai | Form transaksi Master-Detail logic, multi-slot & anti double-booking |
 | 21 | `SIPELA/Forms/frmPemesanan.Designer.vb` | 9 | [x] Selesai | Form transaksi Master-Detail UI designer (2 tab: Input & Riwayat) |
+| 22 | `SIPELA/Forms/frmLaporan.vb` | 10 | [x] Selesai | Form laporan relasional, agregasi, export CSV/Excel, & cetak PDF/Struk |
+| 23 | `SIPELA/Forms/frmLaporan.Designer.vb` | 10 | [x] Selesai | Form laporan UI designer (2 tab: Transaksi & Ringkasan Bulanan) |
+| 24 | `SIPELA/Forms/frmLaporan.resx` | 10 | [x] Selesai | Resource file untuk `frmLaporan` (Visual Studio Designer support) |

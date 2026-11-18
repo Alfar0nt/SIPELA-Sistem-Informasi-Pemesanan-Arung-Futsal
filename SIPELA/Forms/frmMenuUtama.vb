@@ -24,11 +24,13 @@ Namespace Forms
                 btnMasterLapangan.Enabled = True
                 btnMasterUsers.Enabled = True
                 btnPemesanan.Enabled = True
+                btnLaporan.Enabled = True
             Else
                 ' Admin
                 btnMasterLapangan.Enabled = True
                 btnMasterUsers.Enabled = False
                 btnPemesanan.Enabled = True
+                btnLaporan.Enabled = False
             End If
         End Sub
 
@@ -49,23 +51,26 @@ Namespace Forms
 
         Private Sub btnPembayaran_Click(sender As Object, e As EventArgs) Handles btnPembayaran.Click
             ModErrorHandler.TampilkanInfo(
-                "Fitur Transaksi Pembayaran sedang disiapkan untuk tahap berikutnya (Week 11/Final Project).",
+                "Fitur Transaksi Pembayaran terpisah sedang disiapkan untuk tahap Final Project (pencatatan DP & Pelunasan sudah terintegrasi di Form Pemesanan).",
                 "Fitur Mendatang"
             )
         End Sub
 
         Private Sub btnJadwal_Click(sender As Object, e As EventArgs) Handles btnJadwal.Click
             ModErrorHandler.TampilkanInfo(
-                "Fitur Kalender Jadwal Lapangan sedang disiapkan untuk tahap berikutnya (Week 11/Final Project).",
+                "Fitur Kalender Jadwal Lapangan sedang disiapkan untuk tahap Final Project.",
                 "Fitur Mendatang"
             )
         End Sub
 
         Private Sub btnLaporan_Click(sender As Object, e As EventArgs) Handles btnLaporan.Click
-            ModErrorHandler.TampilkanInfo(
-                "Fitur Laporan Pendapatan & Okupansi sedang disiapkan untuk tahap berikutnya (Week 11/Final Project).",
-                "Fitur Mendatang"
-            )
+            If Not ModSesi.IsOwner Then
+                ModErrorHandler.TampilkanPeringatan("Menu Laporan Pendapatan & Okupansi hanya dapat diakses oleh Owner.", "Akses Ditolak")
+                Return
+            End If
+
+            Dim formLaporan As New frmLaporan()
+            formLaporan.ShowDialog(Me)
         End Sub
 
         Private Sub btnLogout_Click(sender As Object, e As EventArgs) Handles btnLogout.Click
